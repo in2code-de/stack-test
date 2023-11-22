@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+  httpd:
+    image: in2code/httpd:2.4-alpine
+    healthcheck:
+      test: wget --no-check-certificate --no-verbose --tries=1 --spider https://web.local.co-stack-test.com || exit 1
+      interval: 15s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
+    volumes:
+      - ./:/app/
+    environment:
+      VIRTUAL_HOST: web.local.co-stack-test.com
+      VIRTUAL_PORT: 443
+      VIRTUAL_PROTO: https
+    networks:
+      default:
+        aliases:
+          - web.local.co-stack-test.com
+
+  php:
+    image: in2code/php-dev:8.1-fpm
+    volumes:
+      - ./:/app/
+      - $HOME/.composer/auth.json:/tmp/composer/auth.json
+      - $HOME/.composer/cache/:/tmp/composer/cache/
+      - $HOME/.phive/:/tmp/phive/
+      - $SSH_AUTH_SOCK:$SSH_AUTH_SOCK
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      SSH_AUTH_SOCK: $SSH_AUTH_SOCK
+
+  mysql:
+    image: in2code/mysql:8.0
+    volumes:
+      - mysql-data:/var/lib/mysql/
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: app
+      MYSQL_USER: app
+      MYSQL_PASSWORD: app
+    ports:
+      - 15622:3306
+
+  mail:
+    image: axllent/mailpit
+    environment:
+      VIRTUAL_HOST: mail.local.co-stack-test.com
+      VIRTUAL_PORT: 8025
+
+  selenium-hub:
+    image: selenium/hub
+    shm_size: 2gb
+    healthcheck:
+      test: '/opt/bin/check-grid.sh --host 0.0.0.0 --port 4444'
+      interval: 15s
+      timeout: 30s
+      retries: 5
+    environment:
+      SE_EVENT_BUS_PUBLISH_PORT: 4442
+      SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
+      SE_NODE_OVERRIDE_MAX_SESSIONS: true
+      SE_NODE_MAX_SESSIONS: 5
+
+  selenium-node-chrome:
+    image: selenium/node-chrome
+    shm_size: 2gb
+    environment:
+      SE_EVENT_BUS_HOST: selenium-hub
+      SE_EVENT_BUS_PUBLISH_PORT: 4442
+      SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
+      SE_NODE_OVERRIDE_MAX_SESSIONS: true
+      SE_NODE_MAX_SESSIONS: 5
+      SE_VNC_NO_PASSWORD: 1
+    ports:
+      - 28376:5900
+
+  selenium-node-edge:
+    image: selenium/node-edge
+    shm_size: 2gb
+    environment:
+      SE_EVENT_BUS_HOST: selenium-hub
+      SE_EVENT_BUS_PUBLISH_PORT: 4442
+      SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
+      SE_NODE_OVERRIDE_MAX_SESSIONS: true
+      SE_NODE_MAX_SESSIONS: 5
+      SE_VNC_NO_PASSWORD: 1
+    ports:
+      - 18155:5900
+
+  selenium-node-firefox:
+    image: selenium/node-firefox
+    shm_size: 2gb
+    environment:
+      SE_EVENT_BUS_HOST: selenium-hub
+      SE_EVENT_BUS_PUBLISH_PORT: 4442
+      SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
+      SE_NODE_OVERRIDE_MAX_SESSIONS: true
+      SE_NODE_MAX_SESSIONS: 5
+      SE_VNC_NO_PASSWORD: 1
+    ports:
+      - 56412:5900
+
+volumes:
+  mysql-data:

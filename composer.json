@@ -1,0 +1,18 @@
+{
+  "name": "co-stack/stack-test",
+  "description": "Testing Framework",
+  "authors": [
+    {
+      "name": "Oliver Eglseder",
+      "email": "oliver.eglseder@co-stack.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "CoStack\\Stacktest\\": "src"
+    }
+  },
+  "require": {
+    "php-webdriver/webdriver": "^1.15"
+  }
+}
