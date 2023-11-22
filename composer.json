@@ -9,7 +9,12 @@
   ],
   "autoload": {
     "psr-4": {
-      "CoStack\\Stacktest\\": "src"
+      "CoStack\\StackTest\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "CoStack\\StackTest\\Tests\\": "tests"
     }
   },
   "require": {

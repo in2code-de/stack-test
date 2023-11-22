@@ -2,35 +2,48 @@
 
 declare(strict_types=1);
 
-namespace CoStack\Stacktest;
+namespace CoStack\StackTest;
 
-use Facebook\WebDriver\Chrome\ChromeOptions;
-use Facebook\WebDriver\Remote\DesiredCapabilities;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
-use Facebook\WebDriver\WebDriverBy;
+use CoStack\StackTest\Iterator\RecursiveTestFileFilterIterator;
 
-use function register_shutdown_function;
-use function var_dump;
+use RecursiveDirectoryIterator;
+
+use RecursiveIteratorIterator;
+use ReflectionClass;
+use ReflectionMethod;
 
 class Tester
 {
     public function run(): void
     {
-        $serverUrl = 'http://selenium-hub:4444';
-        $desiredCapabilities = DesiredCapabilities::chrome();
-        $desiredCapabilities->setCapability(ChromeOptions::CAPABILITY, ['args' => ['ignore-certificate-errors']]);
-
-        $driverOne = RemoteWebDriver::create($serverUrl, $desiredCapabilities);
-        register_shutdown_function(static fn() => $driverOne->quit());
-
-        $driverTwo = RemoteWebDriver::create($serverUrl, $desiredCapabilities);
-        register_shutdown_function(static fn() => $driverTwo->quit());
-
-        $driverOne->get('https://web.local.co-stack-test.com/test.php');
-        $driverTwo->get('https://web.local.co-stack-test.com/test.php');
-        $bodyOne = $driverOne->findElements(WebDriverBy::xpath('//*'));
-        $bodyTwo = $driverTwo->findElements(WebDriverBy::xpath('//*'));
-        var_dump($bodyOne);
-        var_dump($bodyTwo);
+        $files = new RecursiveIteratorIterator(
+            new RecursiveTestFileFilterIterator(
+                new RecursiveDirectoryIterator(
+                    __DIR__ . '/../tests',
+                ),
+            ),
+        );
+        $files = iterator_to_array($files);
+        $declaredClasses = get_declared_classes();
+        foreach ($files as $file) {
+            require $file;
+            $className = substr($file->getFilename(), 0, -4);
+            $newDeclaredClasses = get_declared_classes();
+            $newClasses = array_diff($newDeclaredClasses, $declaredClasses);
+            foreach ($newClasses as $newClass) {
+                if (str_ends_with($newClass, $className)) {
+                    $reflection = new ReflectionClass($newClass);
+                    $parentClass = $reflection->getParentClass();
+                    if ($parentClass && $parentClass->getName() === TestCase::class) {
+                        $test = new $newClass();
+                        foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+                            if (str_starts_with($method->getName(), 'test')) {
+                                $test->{$method->getName()}();
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

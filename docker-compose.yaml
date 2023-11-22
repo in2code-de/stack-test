@@ -3,12 +3,12 @@ version: '3.8'
 services:
   httpd:
     image: in2code/httpd:2.4-alpine
-    healthcheck:
-      test: wget --no-check-certificate --no-verbose --tries=1 --spider https://web.local.co-stack-test.com || exit 1
-      interval: 15s
-      retries: 5
-      start_period: 10s
-      timeout: 10s
+    #healthcheck:
+    #  test: wget --no-check-certificate --no-verbose --tries=1 --spider https://web.local.co-stack-test.com || exit 1
+    #  interval: 15s
+    #  retries: 5
+    #  start_period: 10s
+    #  timeout: 10s
     volumes:
       - ./:/app/
     environment:
