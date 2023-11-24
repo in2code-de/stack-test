@@ -99,17 +99,10 @@ install-project: .install-packages .create-directories destroy .add-hosts-entry 
 
 ## Print Project URIs
 urls:
-	echo "$(EMOJI_telescope) Project URLs:"; \
-	echo ''; \
-	printf "  %-17s %s\n" "Local Frontend:" "https://$(HOST_LOCAL)/"; \
-	printf "  %-17s %s\n" "Local Backend:" "https://$(HOST_LOCAL)/typo3/"; \
-	printf "  %-17s %s\n" "Foreign Frontend:" "https://$(HOST_FOREIGN)/"; \
-	printf "  %-17s %s\n" "Foreign Backend:" "https://$(HOST_FOREIGN)/typo3/"; \
-	printf "  %-17s %s\n" "Local Solr:" "https://$(SOLR_LOCAL)/"; \
-	printf "  %-17s %s\n" "Foreign Solr:" "https://$(SOLR_FOREIGN)/"; \
-	printf "  %-17s %s\n" "Local Minio:" "https://$(MINIO_LOCAL)/"; \
-	printf "  %-17s %s\n" "Foreign Minio:" "https://$(MINIO_FOREIGN)/"; \
-	printf "  %-17s %s\n" "Mail:" "https://$(MAIL_HOST)/";
+	echo "$(EMOJI_telescope) Project URLs:"
+	echo ''
+	printf "  %-17s %s\n" "Local Frontend:" "https://web.local.co-stack-test.com/"
+	printf "  %-17s %s\n" "Mail:" "https://mail.local.co-stack-test.com/"
 
 ## Create the hosts entry for the custom project URL (non-dinghy convention)
 .add-hosts-entry:
