@@ -9,11 +9,6 @@ use PHPUnit\Event\Test\Failed;
 
 class BrowserHistoryFailedSubscriber extends AbstractFailedSubscriber
 {
-    protected function getFileExtension(RemoteWebDriver $driver): string
-    {
-        return '.history.csv';
-    }
-
     protected function getFileContents(RemoteWebDriver $driver): string
     {
         return implode("\n", $this->recorder->getHistory($driver));

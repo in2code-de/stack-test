@@ -16,17 +16,23 @@ class Bootstrap implements Extension
 {
     public function bootstrap(Configuration $configuration, Facade $facade, ParameterCollection $parameters): void
     {
-        if ($parameters->has('screenshotsDir')) {
-            $directory = $parameters->get('screenshotsDir');
-            $facade->registerSubscriber(new ScreenshotFailedSubscriber($directory));
+        if ($parameters->has('screenshot')) {
+            $fileName = $parameters->get('screenshot');
+            $facade->registerSubscriber(
+                new ScreenshotFailedSubscriber($fileName, $configuration, $facade, $parameters),
+            );
         }
-        if ($parameters->has('pageSourceDir')) {
-            $directory = $parameters->get('pageSourceDir');
-            $facade->registerSubscriber(new PageSourceFailedSubscriber($directory));
+        if ($parameters->has('pageSource')) {
+            $fileName = $parameters->get('pageSource');
+            $facade->registerSubscriber(
+                new PageSourceFailedSubscriber($fileName, $configuration, $facade, $parameters),
+            );
         }
-        if ($parameters->has('historyDir')) {
-            $directory = $parameters->get('historyDir');
-            $facade->registerSubscriber(new BrowserHistoryFailedSubscriber($directory));
+        if ($parameters->has('history')) {
+            $fileName = $parameters->get('history');
+            $facade->registerSubscriber(
+                new BrowserHistoryFailedSubscriber($fileName, $configuration, $facade, $parameters),
+            );
         }
     }
 }

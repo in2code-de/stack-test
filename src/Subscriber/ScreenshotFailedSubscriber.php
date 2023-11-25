@@ -9,11 +9,6 @@ use PHPUnit\Event\Test\Failed;
 
 class ScreenshotFailedSubscriber extends AbstractFailedSubscriber
 {
-    protected function getFileExtension(RemoteWebDriver $driver): string
-    {
-        return '.screenshot.jpg';
-    }
-
     protected function getFileContents(RemoteWebDriver $driver): string
     {
         return $driver->takeScreenshot();

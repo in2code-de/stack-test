@@ -9,11 +9,6 @@ use PHPUnit\Event\Test\Failed;
 
 class PageSourceFailedSubscriber extends AbstractFailedSubscriber
 {
-    protected function getFileExtension(RemoteWebDriver $driver): string
-    {
-        return '.page_source.html';
-    }
-
     protected function getFileContents(RemoteWebDriver $driver): string
     {
         return $driver->getPageSource();

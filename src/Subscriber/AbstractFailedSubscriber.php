@@ -6,16 +6,24 @@ namespace CoStack\StackTest\Subscriber;
 
 use CoStack\StackTest\Recorder\WebDriverRecorder;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use PHPUnit\Event\Code\TestMethod;
 use PHPUnit\Event\Test\Failed;
 use PHPUnit\Event\Test\FailedSubscriber;
+use PHPUnit\Runner\Extension\Facade;
+use PHPUnit\Runner\Extension\ParameterCollection;
+use PHPUnit\TextUI\Configuration\Configuration;
 use WeakReference;
 
 abstract class AbstractFailedSubscriber implements FailedSubscriber
 {
     protected readonly WebDriverRecorder $recorder;
 
-    public function __construct(protected readonly string $directory)
-    {
+    public function __construct(
+        protected readonly string $fileName,
+        protected readonly Configuration $configuration,
+        protected readonly Facade $facade,
+        protected readonly ParameterCollection $parameters,
+    ) {
         $this->recorder = WebDriverRecorder::getInstance();
     }
 
@@ -26,18 +34,37 @@ abstract class AbstractFailedSubscriber implements FailedSubscriber
             return;
         }
 
-        $directory = $this->directory;
-        if (!str_starts_with($directory, '/')) {
-            $directory = getcwd() . '/' . $directory;
+        $test = $event->test();
+        if (!$test instanceof TestMethod) {
+            echo 'Can not export information for tests which are not test methods';
+            return;
         }
-        $fileName = str_replace([' ', '\\'], '_', $event->test()->id());
-        $absoluteFileName = $directory . '/' . $fileName . $this->getFileExtension($driver);
+        $testId = str_replace([' ', '\\'], '_', $test->id());
 
-        $this->ensureDirectoryExists($directory);
+        $fileName = str_replace(
+            [
+                '{testId}',
+                '{testClass}',
+                '{testMethod}',
+                '{seed}',
+            ],
+            [
+                $testId,
+                str_replace('\\', '_', $test->className()),
+                $test->methodName(),
+                $this->configuration->randomOrderSeed(),
+            ],
+            $this->fileName,
+        );
+        if (!str_starts_with($fileName, '/')) {
+            $fileName = getcwd() . '/' . $fileName;
+        }
+
+        $this->ensureDirectoryExists($fileName);
         $fileContents = $this->getFileContents($driver);
-        file_put_contents($absoluteFileName, $fileContents);
+        file_put_contents($fileName, $fileContents);
 
-        $this->printNotification($absoluteFileName, $event);
+        $this->printNotification($fileName, $event);
     }
 
     protected function getLastUsedDriverFromHistory(): ?RemoteWebDriver
@@ -61,16 +88,15 @@ abstract class AbstractFailedSubscriber implements FailedSubscriber
         return $driver;
     }
 
-    abstract protected function getFileExtension(RemoteWebDriver $driver): string;
-
     abstract protected function getFileContents(RemoteWebDriver $driver): string;
 
     protected function printNotification(string $fileName, Failed $event): void
     {
     }
 
-    public function ensureDirectoryExists(string $directory): void
+    public function ensureDirectoryExists(string $fileName): void
     {
+        $directory = dirname($fileName);
         if (!is_dir($directory) && !mkdir($directory, 0775, true) && !is_dir($directory)) {
             throw new RuntimeException(sprintf('Directory "%s" was not created', $directory));
         }
