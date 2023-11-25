@@ -19,6 +19,6 @@
   },
   "require": {
     "php-webdriver/webdriver": "^1.15",
-    "phpunit/phpunit": "^10.4"
+    "phpunit/phpunit": "^9.6 || ^10.4"
   }
 }

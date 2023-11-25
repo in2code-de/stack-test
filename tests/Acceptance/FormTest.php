@@ -16,9 +16,9 @@ class FormTest extends BrowserTestCase
     protected static ?Session $sessionInstance = null;
     protected ?Session $session = null;
 
-    public function __construct(string $name)
+    public function __construct()
     {
-        parent::__construct($name);
+        parent::__construct(...func_get_args());
         self::$sessionInstance ??= (new SessionFactory())->create();
         $this->session = self::$sessionInstance;
     }
