@@ -20,4 +20,12 @@
             <directory>src</directory>
         </include>
     </source>
+
+    <extensions>
+        <bootstrap class="CoStack\StackTest\Bootstrap">
+            <parameter name="screenshotsDir" value="build/test/artifacts/failed"/>
+            <parameter name="pageSourceDir" value="build/test/artifacts/failed"/>
+            <parameter name="historyDir" value="build/test/artifacts/failed"/>
+        </bootstrap>
+    </extensions>
 </phpunit>

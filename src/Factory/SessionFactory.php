@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Factory;
 
+use CoStack\StackTest\Decorator\WebDriverDecorator;
+use CoStack\StackTest\Recorder\WebDriverRecorder;
 use CoStack\StackTest\Session;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\WebDriverCapabilityType;
+use Facebook\WebDriver\WebDriver;
 
 class SessionFactory
 {
@@ -19,23 +22,19 @@ class SessionFactory
         ]);
     }
 
-    protected function createChromeDriver(string $seleniumUrl): RemoteWebDriver
+    protected function createChromeDriver(string $seleniumUrl): WebDriver
     {
         $desiredCapabilities = DesiredCapabilities::chrome();
         $desiredCapabilities->setCapability(WebDriverCapabilityType::ACCEPT_SSL_CERTS, true);
         $driver = RemoteWebDriver::create($seleniumUrl, $desiredCapabilities, null, 3000);
-        // Safety fallback to eliminate sessions even if PHP fails
-        register_shutdown_function(static fn() => $driver->quit());
-        return $driver;
+        return new WebDriverDecorator($driver, WebDriverRecorder::getInstance());
     }
 
-    protected function createFirefoxDriver(string $seleniumUrl): RemoteWebDriver
+    protected function createFirefoxDriver(string $seleniumUrl): WebDriver
     {
         $desiredCapabilities = DesiredCapabilities::firefox();
         $desiredCapabilities->setCapability(WebDriverCapabilityType::ACCEPT_SSL_CERTS, true);
         $driver = RemoteWebDriver::create($seleniumUrl, $desiredCapabilities, null, 3000);
-        // Safety fallback to eliminate sessions even if PHP fails
-        register_shutdown_function(static fn() => $driver->quit());
-        return $driver;
+        return new WebDriverDecorator($driver, WebDriverRecorder::getInstance());
     }
 }
