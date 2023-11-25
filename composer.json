@@ -9,7 +9,8 @@
   ],
   "autoload": {
     "psr-4": {
-      "CoStack\\StackTest\\": "src"
+      "CoStack\\StackTest\\": "src",
+      "PHPUnit\\": "phpunit"
     }
   },
   "autoload-dev": {
