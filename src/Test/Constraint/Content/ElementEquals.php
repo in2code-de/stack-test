@@ -13,10 +13,7 @@ class ElementEquals extends SessionWithSelectorConstraint
     protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
     {
         $element = $driver->findElement($this->selector);
-        $value = match ($element->getTagName()) {
-            'input' => $element->getAttribute('value'),
-            default => $element->getText(),
-        };
+        $value = $this->resolveElementText($element);
         return $value === $other;
     }
 
@@ -25,10 +22,7 @@ class ElementEquals extends SessionWithSelectorConstraint
         $browserName = $driver->getCapabilities()->getBrowserName();
 
         $element = $driver->findElement($this->selector);
-        $value = match ($element->getTagName()) {
-            'input' => $element->getAttribute('value'),
-            default => $element->getText(),
-        };
+        $value = $this->resolveElementText($element);
 
         return sprintf(
             'is the same as value "%s" of element %s on page %s in browser %s',

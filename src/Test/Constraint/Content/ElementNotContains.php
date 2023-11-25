@@ -13,10 +13,7 @@ class ElementNotContains extends SessionWithSelectorConstraint
     protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
     {
         $element = $driver->findElement($this->selector);
-        $value = match ($element->getTagName()) {
-            'input' => $element->getAttribute('value'),
-            default => $element->getText(),
-        };
+        $value = $this->resolveElementText($element);
         return !str_contains($value, $other);
     }
 
@@ -25,10 +22,7 @@ class ElementNotContains extends SessionWithSelectorConstraint
         $browserName = $driver->getCapabilities()->getBrowserName();
 
         $element = $driver->findElement($this->selector);
-        $value = match ($element->getTagName()) {
-            'input' => $element->getAttribute('value'),
-            default => $element->getText(),
-        };
+        $value = $this->resolveElementText($element);
 
         return sprintf(
             'occurs not in the text/value "%s" of element %s on page %s in browser %s',

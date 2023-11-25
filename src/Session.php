@@ -7,6 +7,8 @@ namespace CoStack\StackTest;
 use Closure;
 use CoStack\StackTest\Elements\AbstractSelectable;
 use CoStack\StackTest\Elements\Checkboxes;
+use CoStack\StackTest\Elements\Element;
+use CoStack\StackTest\Elements\Elements;
 use CoStack\StackTest\Elements\FormElement;
 use CoStack\StackTest\Elements\Radios;
 use CoStack\StackTest\Elements\Select;
@@ -162,6 +164,16 @@ JS;
         foreach ($this->drivers as $driver) {
             $driver->findElement($selector)->submit();
         }
+    }
+
+    public function findElement(WebDriverBy $selector): Element
+    {
+        $elementPerDriver = [];
+        foreach ($this->drivers as $driver) {
+            $browserName = $driver->getCapabilities()->getBrowserName();
+            $elementPerDriver[$browserName] = $driver->findElement($selector);
+        }
+        return new Element($elementPerDriver);
     }
 
     public function findElements(WebDriverBy $selector): Elements

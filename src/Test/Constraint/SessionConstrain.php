@@ -8,6 +8,7 @@ use CoStack\StackTest\Session;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverElement;
 use PHPUnit\Framework\Constraint\Constraint;
 
 abstract class SessionConstrain extends Constraint
@@ -43,6 +44,14 @@ abstract class SessionConstrain extends Constraint
             }
         }
         return $other;
+    }
+
+    protected function resolveElementText(WebDriverElement $element): string
+    {
+        return match ($element->getTagName()) {
+            'textarea', 'input' => $element->getAttribute('value'),
+            default => $element->getText(),
+        };
     }
 
     protected function matches(mixed $other): bool

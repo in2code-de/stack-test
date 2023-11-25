@@ -37,5 +37,4 @@ class SetCookieIsSame extends SetCookieIsEqual
         }
         return false;
     }
-
 }

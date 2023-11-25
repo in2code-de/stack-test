@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CoStack\StackTest;
+namespace CoStack\StackTest\Elements;
 
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverElement;
