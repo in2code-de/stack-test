@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest;
 
+use Closure;
 use CoStack\StackTest\Elements\AbstractSelectable;
 use CoStack\StackTest\Elements\Checkboxes;
 use CoStack\StackTest\Elements\FormElement;
@@ -15,6 +16,7 @@ use Facebook\WebDriver\Exception\ElementNotInteractableException;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverCheckboxes;
+use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\WebDriverRadios;
 use Facebook\WebDriver\WebDriverSelect;
 
@@ -185,6 +187,13 @@ JS;
         foreach ($this->drivers as $driver) {
             $resolvedArguments = $this->resolveWebDriverByForDriver($driver, $arguments);
             $driver->executeAsyncScript($javascript, $resolvedArguments);
+        }
+    }
+
+    public function waitUntil(Closure|WebDriverExpectedCondition $condition): void
+    {
+        foreach ($this->drivers as $driver) {
+            $driver->wait()->until($condition);
         }
     }
 
