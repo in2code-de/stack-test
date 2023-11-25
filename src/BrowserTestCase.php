@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace CoStack\StackTest;
 
 use CoStack\StackTest\Test\Constraint\Content\ElementContains;
+use CoStack\StackTest\Test\Constraint\Content\ElementEquals;
 use CoStack\StackTest\Test\Constraint\Content\ElementNotContains;
+use CoStack\StackTest\Test\Constraint\Content\ElementNotEquals;
 use CoStack\StackTest\Test\Constraint\Content\PageContains;
 use CoStack\StackTest\Test\Constraint\Content\PageNotContains;
 use CoStack\StackTest\Test\Constraint\Cookie\SetCookieIsEqual;
@@ -49,12 +51,28 @@ abstract class BrowserTestCase extends TestCase
         self::assertThat($string, new ElementContains($session, $selector));
     }
 
+    protected static function assertElementEquals(
+        Session|RemoteWebDriver $session,
+        string $string,
+        WebDriverBy $selector,
+    ): void {
+        self::assertThat($string, new ElementEquals($session, $selector));
+    }
+
     protected static function assertElementNotContains(
         Session|RemoteWebDriver $session,
         string $string,
         WebDriverBy $selector,
     ): void {
         self::assertThat($string, new ElementNotContains($session, $selector));
+    }
+
+    protected static function assertElementNotEquals(
+        Session|RemoteWebDriver $session,
+        string $string,
+        WebDriverBy $selector,
+    ): void {
+        self::assertThat($string, new ElementNotEquals($session, $selector));
     }
 
     public static function assertPageContains(Session|RemoteWebDriver $session, string $string): void
