@@ -2,22 +2,14 @@
 
 declare(strict_types=1);
 
-namespace CoStack\StackTest\Test\Constraint\Form;
+namespace CoStack\StackTest\Test\Constraint\Form\Input\Text;
 
-use CoStack\StackTest\Session;
-use CoStack\StackTest\Test\Constraint\SessionConstrain;
+use CoStack\StackTest\Test\Constraint\SessionWithSelectorConstraint;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
-use Facebook\WebDriver\WebDriverBy;
 use PHPUnit\Util\Exporter;
 
-class FieldNotEquals extends SessionConstrain
+class FieldNotEquals extends SessionWithSelectorConstraint
 {
-    public function __construct(
-        RemoteWebDriver|Session $session,
-        protected readonly WebDriverBy $selector,
-    ) {
-        parent::__construct($session);
-    }
     protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
     {
         $element = $driver->findElement($this->selector);

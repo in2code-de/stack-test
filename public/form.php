@@ -51,7 +51,7 @@ declare(strict_types=1);
         <label>
             Input name1
             <?php
-            if (isset($_GET['name1'])) {
+            if (isset($_GET['name2'])) {
                 echo sprintf('<input type="text" value="%s" name="name2">', htmlspecialchars($_GET['name2']));
             } else {
                 echo '<input type="text" value="value2" name="name2">';
@@ -69,7 +69,7 @@ declare(strict_types=1);
     <fieldset>
         <legend>Input text with default value value4 with class class2</legend>
         <label>
-            Input name3
+            Input class2
             <input type="text" value="value4" class="class2">
         </label>
     </fieldset>
@@ -84,14 +84,26 @@ declare(strict_types=1);
         <legend>Hidden input text with name3</legend>
         <label>
             Input hidden name3
-            <input type="text" hidden name="name3">
+            <?php
+            if (isset($_GET['name3'])) {
+                echo sprintf('<input type="text" hidden name="name3" value="%s">', htmlspecialchars($_GET['name3']));
+            } else {
+                echo '<input type="text" hidden name="name3">';
+            }
+            ?>
         </label>
     </fieldset>
     <fieldset>
         <legend>input hidden with name3</legend>
         <label>
             Input hidden name4
-            <input type="hidden" name="name4">
+            <?php
+            if (isset($_GET['name4'])) {
+                echo sprintf('<input type="hidden" name="name4" value="%s">', htmlspecialchars($_GET['name4']));
+            } else {
+                echo '<input type="hidden" name="name4">';
+            }
+            ?>
         </label>
     </fieldset>
     <fieldset>
@@ -105,20 +117,39 @@ declare(strict_types=1);
         <legend>Checkbox with name check1</legend>
         <label>
             Checkbox
-            <input type="checkbox" name="check1" value="">
-            <input type="checkbox" name="check1" value="1">
-            <input type="checkbox" name="check1" value="2" checked>
-            <input type="checkbox" name="check1" value="3">
+            <?php
+            if (!isset($_GET['check1']) || !is_array($_GET['check1'])) {
+                $_GET['check1'] = [
+                    2,
+                    3,
+                ];
+            }
+            foreach (range(1, 4) as $number) {
+                if (in_array($number, $_GET['check1'])) {
+                    echo sprintf('<input type="checkbox" name="check1[]" value="%s" checked>', $number);
+                } else {
+                    echo sprintf('<input type="checkbox" name="check1[]" value="%s">', $number);
+                }
+            }
+            ?>
         </label>
     </fieldset>
     <fieldset>
         <legend>radio with name radio1</legend>
         <label>
             Radio
-            <input type="radio" name="radio1" value="">
-            <input type="radio" name="radio1" value="1">
-            <input type="radio" name="radio1" value="2" checked>
-            <input type="radio" name="radio1" value="3">
+            <?php
+            if (!isset($_GET['radio1'])) {
+                $_GET['radio1'] = 2;
+            }
+            foreach (range(1, 4) as $number) {
+                if ($number == $_GET['radio1']) {
+                    echo sprintf('<input type="radio" name="radio1" value="%s" checked>', $number);
+                } else {
+                    echo sprintf('<input type="radio" name="radio1" value="%s">', $number);
+                }
+            }
+            ?>
         </label>
     </fieldset>
     <fieldset>
@@ -127,9 +158,18 @@ declare(strict_types=1);
             Select
             <select name="select1">
                 <option>None</option>
-                <option value="1">Value1</option>
-                <option value="2" selected>Value2</option>
-                <option value="3">Value3</option>
+                <?php
+                if (!isset($_GET['select1'])) {
+                    $_GET['select1'] = 2;
+                }
+                foreach (range(1, 4) as $number) {
+                    if ($number == $_GET['select1']) {
+                        echo sprintf('<option value="%s" selected>Value%s</option>', $number, $number);
+                    } else {
+                        echo sprintf('<option value="%s">Value%s</option>', $number, $number);
+                    }
+                }
+                ?>
             </select>
         </label>
     </fieldset>
@@ -137,11 +177,20 @@ declare(strict_types=1);
         <legend>select multi with name select2</legend>
         <label>
             Select
-            <select name="select2" multiple>
+            <select name="select2[]" multiple>
                 <option>None</option>
-                <option value="1">Value1</option>
-                <option value="2" selected>Value2</option>
-                <option value="3" selected>Value3</option>
+                <?php
+                if (!isset($_GET['select2']) || !is_array($_GET['select2'])) {
+                    $_GET['select2'] = [2, 3];
+                }
+                foreach (range(1, 4) as $number) {
+                    if (in_array($number, $_GET['select2'])) {
+                        echo sprintf('<option value="%s" selected>Value%s</option>', $number, $number);
+                    } else {
+                        echo sprintf('<option value="%s">Value%s</option>', $number, $number);
+                    }
+                }
+                ?>
             </select>
         </label>
     </fieldset>
@@ -151,7 +200,10 @@ declare(strict_types=1);
     </fieldset>
     <fieldset>
         <legend>Submit with name button1 and value value1</legend>
-        <button type="submit" name="button1" value="value1">Submit without value</button>
+        <button type="submit" name="button1" value="value1">Submit with value</button>
+        <?php
+        echo sprintf('<input type="text" value="%s" name="button1input">', htmlspecialchars($_GET['button1'] ?? ''))
+        ?>
     </fieldset>
 </form>
 

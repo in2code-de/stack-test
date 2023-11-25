@@ -6,6 +6,8 @@ namespace CoStack\StackTest\Test\Constraint;
 
 use CoStack\StackTest\Session;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\WebDriver;
+use Facebook\WebDriver\WebDriverBy;
 use PHPUnit\Framework\Constraint\Constraint;
 
 abstract class SessionConstrain extends Constraint
@@ -17,6 +19,32 @@ abstract class SessionConstrain extends Constraint
     ) {
     }
 
+    protected function resolveSelectorsInOtherToText(WebDriver $driver, mixed $other): mixed
+    {
+        if ($other instanceof WebDriverBy) {
+            $other = $driver->findElement($other)->getText();
+        }
+        if (is_array($other)) {
+            foreach ($other as $index => $value) {
+                $other[$index] = $this->resolveSelectorsInOtherToText($driver, $value);
+            }
+        }
+        return $other;
+    }
+
+    protected function resolveSelectorsInOtherToValue(WebDriver $driver, mixed $other): mixed
+    {
+        if ($other instanceof WebDriverBy) {
+            $other = $driver->findElement($other)->getAttribute('value');
+        }
+        if (is_array($other)) {
+            foreach ($other as $index => $value) {
+                $other[$index] = $this->resolveSelectorsInOtherToValue($driver, $value);
+            }
+        }
+        return $other;
+    }
+
     protected function matches(mixed $other): bool
     {
         if ($this->session instanceof RemoteWebDriver) {
@@ -25,7 +53,7 @@ abstract class SessionConstrain extends Constraint
             return $this->driverResults[$browserName];
         }
 
-        foreach ($this->session->getDrivers() as $driver) {
+        foreach ($this->session->drivers as $driver) {
             $browserName = $driver->getCapabilities()->getBrowserName();
             $this->driverResults[$browserName] = $this->driverMatches($other, $driver);
         }
@@ -44,7 +72,7 @@ abstract class SessionConstrain extends Constraint
         $onlyFailedDrivers = 'failureDescription' === $frame['function'];
 
         $strings = [];
-        foreach ($this->session->getDrivers() as $driver) {
+        foreach ($this->session->drivers as $driver) {
             $browserName = $driver->getCapabilities()->getBrowserName();
             if (!$onlyFailedDrivers || false === $this->driverResults[$browserName]) {
                 $strings[] = $this->descriptionForDriver($driver, $exportObjects);

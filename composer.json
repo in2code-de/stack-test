@@ -18,6 +18,7 @@
     }
   },
   "require": {
-    "php-webdriver/webdriver": "^1.15"
+    "php-webdriver/webdriver": "^1.15",
+    "phpunit/phpunit": "^10.4"
   }
 }
