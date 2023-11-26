@@ -20,6 +20,7 @@ use CoStack\StackTest\Test\Constraint\Existence\ElementExists;
 use CoStack\StackTest\Test\Constraint\Existence\ElementNotExists;
 use CoStack\StackTest\Test\Constraint\Existence\LinkExists;
 use CoStack\StackTest\Test\Constraint\Existence\LinkNotExists;
+use CoStack\StackTest\Test\Constraint\Form\FormDataEquals;
 use CoStack\StackTest\Test\Constraint\Form\Input\Check\CheckboxesAreChecked;
 use CoStack\StackTest\Test\Constraint\Form\Input\Check\CheckboxesAreNotChecked;
 use CoStack\StackTest\Test\Constraint\Form\Input\Check\CheckboxIsChecked;
@@ -239,6 +240,14 @@ abstract class BrowserTestCase extends TestCase
         WebDriverBy $selectSelector,
     ): void {
         self::assertThat($value, new OptionsAreCheckedByValue($session, $selectSelector));
+    }
+
+    protected static function assertFormDataEquals(
+        Session|RemoteWebDriver $session,
+        array $value,
+        WebDriverBy $selectSelector,
+    ): void {
+        self::assertThat($value, new FormDataEquals($session, $selectSelector));
     }
 
     protected static function assertSourceContains(Session|RemoteWebDriver $session, string $string): void

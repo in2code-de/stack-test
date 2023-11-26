@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CoStack\StackTest\Elements;
+namespace CoStack\StackTest\Elements\Parallel;
 
 use Exception;
 use Facebook\WebDriver\Exception\NoSuchElementException;

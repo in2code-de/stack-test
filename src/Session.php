@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace CoStack\StackTest;
 
 use Closure;
-use CoStack\StackTest\Elements\AbstractSelectable;
-use CoStack\StackTest\Elements\Checkboxes;
-use CoStack\StackTest\Elements\Element;
-use CoStack\StackTest\Elements\Elements;
-use CoStack\StackTest\Elements\FormElement;
-use CoStack\StackTest\Elements\Radios;
-use CoStack\StackTest\Elements\Select;
+use CoStack\StackTest\Elements\Parallel\AbstractSelectable;
+use CoStack\StackTest\Elements\Parallel\Checkboxes;
+use CoStack\StackTest\Elements\Parallel\Element;
+use CoStack\StackTest\Elements\Parallel\Elements;
+use CoStack\StackTest\Elements\Parallel\FormElement;
+use CoStack\StackTest\Elements\Parallel\Radios;
+use CoStack\StackTest\Elements\Parallel\Select;
+use CoStack\StackTest\Elements\Single\Form;
 use CoStack\StackTest\Exception\HiddenInputCanNotBeFilledException;
 use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\Exception\ElementNotInteractableException;
@@ -159,10 +160,21 @@ JS;
         return new Select($selects);
     }
 
-    public function submitForm(WebDriverBy $selector): void
+    public function submitForm(WebDriverBy $formSelector, array $data = []): void
+    {
+        $this->fillForm($formSelector, $data);
+        foreach ($this->drivers as $driver) {
+            $formElement = $driver->findElement($formSelector);
+            $formElement->submit();
+        }
+    }
+
+    public function fillForm(WebDriverBy $formSelector, array $data): void
     {
         foreach ($this->drivers as $driver) {
-            $driver->findElement($selector)->submit();
+            $formElement = $driver->findElement($formSelector);
+            $form = new Form($formElement);
+            $form->setData($data);
         }
     }
 

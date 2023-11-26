@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CoStack\StackTest\Tests\Acceptance;
 
 use CoStack\StackTest\BrowserTestCase;
-use CoStack\StackTest\Elements\Select;
+use CoStack\StackTest\Elements\Parallel\Select;
 use CoStack\StackTest\Exception\HiddenInputCanNotBeFilledException;
 use CoStack\StackTest\Factory\SessionFactory;
 use CoStack\StackTest\Session;
@@ -193,5 +193,29 @@ class FormTest extends BrowserTestCase
         $selectedValues = $select->getSelectedValues();
 
         self::assertEquals(['chrome' => '3', 'firefox' => '3'], $selectedValues);
+    }
+
+    public function testFormCanBeSubmittedWithValueData(): void
+    {
+        $this->session->get('https://web.local.co-stack-test.com/form.php');
+
+        $formSelector = WebDriverBy::name('form1');
+
+        $formData = [
+            'name1' => 'testString1',
+            'name2' => 'testString2',
+            'check1[]' => ['2', '4'],
+            'radio1' => '3',
+            'select1' => '3',
+            'select2[]' => ['1', '3']
+        ];
+        $this->session->submitForm($formSelector, $formData);
+
+        $formDataWithDefaults = array_merge($formData, [
+            'button1input' => '',
+        ]);
+
+
+        self::assertFormDataEquals($this->session, $formDataWithDefaults, $formSelector);
     }
 }
