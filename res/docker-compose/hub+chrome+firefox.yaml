@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   selenium-hub:
-    image: selenium/hub
+    image: ${SELENIUM_HUB_IMAGE:-selenium/hub}
     shm_size: 2gb
     healthcheck:
       test: '/opt/bin/check-grid.sh --host 0.0.0.0 --port 4444'
@@ -16,7 +16,7 @@ services:
       SE_NODE_MAX_SESSIONS: 5
 
   selenium-node-chrome:
-    image: selenium/node-chrome
+    image: ${SELENIUM_NODE_CHROME_IMAGE:-selenium/node-chrome}
     shm_size: 2gb
     environment:
       SE_EVENT_BUS_HOST: selenium-hub
@@ -29,7 +29,7 @@ services:
       - ${SELENIUM_NODE_CHROME_VNC_PORT:-14320}:5900
 
   selenium-node-firefox:
-    image: selenium/node-firefox
+    image: ${SELENIUM_NODE_CHROME_IMAGE:-selenium/node-firefox}
     shm_size: 2gb
     environment:
       SE_EVENT_BUS_HOST: selenium-hub
