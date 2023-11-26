@@ -11,7 +11,7 @@ use Facebook\WebDriver\WebDriverBy;
 
 class TYPO3Helper
 {
-    public static function inIFrameContext(Session $session, Closure $closure): void
+    public static function inContentIFrameContext(Session $session, Closure $closure): void
     {
         $session->inIFrameContext(WebDriverBy::id('typo3-contentIframe'), $closure);
     }
