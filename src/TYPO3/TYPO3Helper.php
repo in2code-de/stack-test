@@ -13,6 +13,7 @@ class TYPO3Helper
 {
     public static function inContentIFrameContext(Session $session, Closure $closure): void
     {
+        self::waitUntilContentIFrameIsLoaded($session);
         $session->inIFrameContext(WebDriverBy::id('typo3-contentIframe'), $closure);
     }
 
