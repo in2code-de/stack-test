@@ -29,7 +29,7 @@ class SessionFactory
     {
         $desiredCapabilities = DesiredCapabilities::chrome();
         $desiredCapabilities->setCapability(WebDriverCapabilityType::ACCEPT_SSL_CERTS, true);
-        $driver = RemoteWebDriver::create($seleniumUrl, $desiredCapabilities, null, 3000);
+        $driver = RemoteWebDriver::create($seleniumUrl, $desiredCapabilities);
         return new WebDriverDecorator($driver, WebDriverRecorder::getInstance());
     }
 
@@ -37,7 +37,7 @@ class SessionFactory
     {
         $desiredCapabilities = DesiredCapabilities::firefox();
         $desiredCapabilities->setCapability(WebDriverCapabilityType::ACCEPT_SSL_CERTS, true);
-        $driver = RemoteWebDriver::create($seleniumUrl, $desiredCapabilities, null, 3000);
+        $driver = RemoteWebDriver::create($seleniumUrl, $desiredCapabilities);
         return new WebDriverDecorator($driver, WebDriverRecorder::getInstance());
     }
 }
