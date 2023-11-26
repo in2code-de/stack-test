@@ -12,46 +12,37 @@ use Facebook\WebDriver\WebDriverBy;
 
 class InitialBrowserTest extends BrowserTestCase
 {
-    protected static ?Session $sessionInstance = null;
-    protected ?Session $session = null;
-
-    public function __construct()
-    {
-        parent::__construct(...func_get_args());
-        self::$sessionInstance ??= (new SessionFactory())->create();
-        $this->session = self::$sessionInstance;
-    }
-
     public function testOpeningUrl(): void
     {
-        $this->session->get('https://web.local.co-stack-test.com/test.php');
+        $session = (new SessionFactory())->create('session1');
+        $session->get('https://web.local.co-stack-test.com/test.php');
 
-        self::assertPageContains($this->session, 'hi there');
+        self::assertPageContains($session, 'hi there');
 
         $cookie = new Cookie('coke', 'matsch');
         $cookie->setSecure(true);
-        $this->session->setCookie($cookie);
+        $session->setCookie($cookie);
 
-        self::assertSetCookieIsEqual($this->session, $cookie);
+        self::assertSetCookieIsEqual($session, $cookie);
 
-        self::assertPageNotContains($this->session, 'hella');
+        self::assertPageNotContains($session, 'hella');
 
-        self::assertElementContains($this->session, 'hi there', WebDriverBy::cssSelector('body'));
-        self::assertElementNotContains($this->session, 'hella', WebDriverBy::cssSelector('body'));
-        self::assertElementExists($this->session, WebDriverBy::cssSelector('body'));
-        self::assertElementNotExists($this->session, WebDriverBy::cssSelector('custom-element'));
+        self::assertElementContains($session, 'hi there', WebDriverBy::cssSelector('body'));
+        self::assertElementNotContains($session, 'hella', WebDriverBy::cssSelector('body'));
+        self::assertElementExists($session, WebDriverBy::cssSelector('body'));
+        self::assertElementNotExists($session, WebDriverBy::cssSelector('custom-element'));
 
-        $this->session->click(WebDriverBy::linkText('test2'));
+        $session->click(WebDriverBy::linkText('test2'));
 
-        self::assertPageContains($this->session, 'PHP Version 8.1');
-        self::assertCurrentUrlContains($this->session, 'est2');
-        self::assertCurrentUrlNotContains($this->session, 'test.php');
+        self::assertPageContains($session, 'PHP Version 8.1');
+        self::assertCurrentUrlContains($session, 'est2');
+        self::assertCurrentUrlNotContains($session, 'test.php');
 
-        self::assertCheckboxIsChecked($this->session, WebDriverBy::name('fuuu'));
-        self::assertCheckboxIsNotChecked($this->session, WebDriverBy::name('faaa'));
+        self::assertCheckboxIsChecked($session, WebDriverBy::name('fuuu'));
+        self::assertCheckboxIsNotChecked($session, WebDriverBy::name('faaa'));
 
         //// Show element IDs for each browser
-        //$elements = $this->session->findElements(WebDriverBy::name('fuuu'));
+        //$elements = $session->findElements(WebDriverBy::name('fuuu'));
         //foreach ($elements->getElementsPerDriver() as $browserName => $elements) {
         //    foreach ($elements as $element) {
         //        echo $element->getID() . ' in ' . $browserName . PHP_EOL;
@@ -62,45 +53,34 @@ class InitialBrowserTest extends BrowserTestCase
 
         $fieldSelector = WebDriverBy::name('huahsd');
 
-        self::assertFieldContains($this->session, 'blabla', $fieldSelector);
-        self::assertFieldNotContains($this->session, 'igigigi', $fieldSelector);
+        self::assertFieldContains($session, 'blabla', $fieldSelector);
+        self::assertFieldNotContains($session, 'igigigi', $fieldSelector);
 
-        $this->session->fillField($fieldSelector, 'igigigi');
-        self::assertFieldContains($this->session, 'igigigi', $fieldSelector);
+        $session->fillField($fieldSelector, 'igigigi');
+        self::assertFieldContains($session, 'igigigi', $fieldSelector);
 
-        $this->session->clearField($fieldSelector);
-        self::assertFieldNotContains($this->session, 'igigigi', $fieldSelector);
+        $session->clearField($fieldSelector);
+        self::assertFieldNotContains($session, 'igigigi', $fieldSelector);
 
         $selectSelector = WebDriverBy::name('kfsljd');
 
-        self::assertOptionIsSelectedByText($this->session, 'Bar', $selectSelector);
-        self::assertOptionIsSelectedByValue($this->session, '1', $selectSelector);
+        self::assertOptionIsSelectedByText($session, 'Bar', $selectSelector);
+        self::assertOptionIsSelectedByValue($session, '1', $selectSelector);
 
-        $this->session->selectOption($selectSelector, 'Foo');
+        $session->selectOption($selectSelector, 'Foo');
 
-        self::assertOptionIsSelectedByText($this->session, 'Foo', $selectSelector);
-        self::assertOptionIsSelectedByValue($this->session, '', $selectSelector);
+        self::assertOptionIsSelectedByText($session, 'Foo', $selectSelector);
+        self::assertOptionIsSelectedByValue($session, '', $selectSelector);
 
-        //$this->session->checkOption()
-        //$this->session->type()
-        //$this->session->attachFile()
-        //$this->session->getAttribute()
-        //$this->session->filterByAttributes()
-        //$this->session->optionIsSelected()
-        //$this->session->seeInTitle()
-        //$this->session->seeNotInTitle()
-        //$this->session->acceptPopup()
-        //$this->session->cancelPopup()
-        //$this->session->seeInPopup()
-        //$this->session->dontSeeInPopup()
-        //$this->session->typeInPopup()
-        //$this->session->reloadPage()
-        //$this->session->moveBack()
-        //$this->session->moveForward()
-        //$this->session->submitForm()
-        //$this->session->waitForElementChange()
-        //$this->session->waitForElement()
-        //$this->session->waitForElementVisible()
+        //$session->checkOption()
+        //$session->type()
+        //$session->attachFile()
+        //$session->getAttribute()
+        //$session->filterByAttributes()
+        //$session->submitForm()
+        //$session->waitForElementChange()
+        //$session->waitForElement()
+        //$session->waitForElementVisible()
         //waitForElementNotVisible
         //waitForElementClickable
         //waitForText
@@ -111,8 +91,6 @@ class InitialBrowserTest extends BrowserTestCase
         //switchToFrame
         //findAndSwitchToFrame
         //waitForJS
-        //executeJS
-        //executeAsyncJS
         //maximizeWindow
         //dragAndDrop
         //moveMouseOver

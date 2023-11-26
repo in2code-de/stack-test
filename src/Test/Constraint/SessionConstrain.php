@@ -16,7 +16,7 @@ abstract class SessionConstrain extends Constraint
     protected array $driverResults = [];
 
     public function __construct(
-        protected readonly Session|RemoteWebDriver $session,
+        public readonly Session|RemoteWebDriver $session,
     ) {
     }
 

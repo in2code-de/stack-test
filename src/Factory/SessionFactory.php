@@ -14,9 +14,12 @@ use Facebook\WebDriver\WebDriver;
 
 class SessionFactory
 {
-    public function create(string $seleniumUrl = 'http://selenium-hub:4444'): Session
+    protected static array $sessions = [];
+
+    public function create(string $sessionId = null, string $seleniumUrl = 'http://selenium-hub:4444'): Session
     {
-        return new Session([
+        $sessionId ??= bin2hex(random_bytes(16));
+        return self::$sessions[$sessionId] ??= new Session($sessionId, [
             'chrome' => $this->createChromeDriver($seleniumUrl),
             'firefox' => $this->createFirefoxDriver($seleniumUrl),
         ]);

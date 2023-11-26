@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest;
 
+use CoStack\StackTest\Elements\Parallel\Alert;
 use CoStack\StackTest\Test\Constraint\Content\ElementContains;
 use CoStack\StackTest\Test\Constraint\Content\ElementEquals;
 use CoStack\StackTest\Test\Constraint\Content\ElementNotContains;
@@ -35,6 +36,17 @@ use CoStack\StackTest\Test\Constraint\Form\Select\Option\OptionIsSelectedByText;
 use CoStack\StackTest\Test\Constraint\Form\Select\Option\OptionIsSelectedByValue;
 use CoStack\StackTest\Test\Constraint\Form\Select\Option\OptionsAreCheckedByText;
 use CoStack\StackTest\Test\Constraint\Form\Select\Option\OptionsAreCheckedByValue;
+use CoStack\StackTest\Test\Constraint\Page\Alert\AlertIsNotVisible;
+use CoStack\StackTest\Test\Constraint\Page\Alert\AlertIsVisible;
+use CoStack\StackTest\Test\Constraint\Page\Alert\AlertMessageContains;
+use CoStack\StackTest\Test\Constraint\Page\Alert\AlertMessageEquals;
+use CoStack\StackTest\Test\Constraint\Page\Alert\AlertMessageNotContains;
+use CoStack\StackTest\Test\Constraint\Page\Alert\AlertMessageNotEquals;
+use CoStack\StackTest\Test\Constraint\Page\IFrame\CurrentIFrameUrlEquals;
+use CoStack\StackTest\Test\Constraint\Page\Title\PageTitleContains;
+use CoStack\StackTest\Test\Constraint\Page\Title\PageTitleEquals;
+use CoStack\StackTest\Test\Constraint\Page\Title\PageTitleNotContains;
+use CoStack\StackTest\Test\Constraint\Page\Title\PageTitleNotEquals;
 use CoStack\StackTest\Test\Constraint\Source\SourceContains;
 use CoStack\StackTest\Test\Constraint\Source\SourceNotContains;
 use Facebook\WebDriver\Cookie;
@@ -248,6 +260,26 @@ abstract class BrowserTestCase extends TestCase
         WebDriverBy $selectSelector,
     ): void {
         self::assertThat($value, new FormDataEquals($session, $selectSelector));
+    }
+
+    protected static function assertPageTitleContains(Session|RemoteWebDriver $session, string $string): void
+    {
+        self::assertThat($string, new PageTitleContains($session));
+    }
+
+    protected static function assertPageTitleEquals(Session|RemoteWebDriver $session, string $string): void
+    {
+        self::assertThat($string, new PageTitleEquals($session));
+    }
+
+    protected static function assertPageTitleNotContains(Session|RemoteWebDriver $session, string $string): void
+    {
+        self::assertThat($string, new PageTitleNotContains($session));
+    }
+
+    protected static function assertPageTitleNotEquals(Session|RemoteWebDriver $session, string $string): void
+    {
+        self::assertThat($string, new PageTitleNotEquals($session));
     }
 
     protected static function assertSourceContains(Session|RemoteWebDriver $session, string $string): void

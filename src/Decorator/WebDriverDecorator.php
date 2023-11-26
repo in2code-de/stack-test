@@ -10,18 +10,11 @@ use Facebook\WebDriver\WebDriverBy;
 
 class WebDriverDecorator extends RemoteWebDriver
 {
-    /**
-     * @noinspection MagicMethodsValidityInspection
-     * @noinspection PhpMissingParentConstructorInspection
-     */
-    public function __construct(
-        public readonly RemoteWebDriver $inner,
-        public readonly WebDriverRecorder $recorder,
-    ) {
-        foreach (get_object_vars($this->inner) as $name => $value) {
-            $this->{$name} = $value;
-        }
-        // Safety fallback to eliminate sessions even if PHP fails
+    public function __construct(public readonly RemoteWebDriver $inner, public readonly WebDriverRecorder $recorder)
+    {
+        parent::__construct($inner->executor, $inner->sessionID, $inner->capabilities, $inner->isW3cCompliant);
+
+        // Safety fallback to eliminate sessions even if PHP fails.
         register_shutdown_function(fn() => $this->quit());
     }
 

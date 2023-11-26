@@ -6,6 +6,7 @@ namespace CoStack\StackTest;
 
 use Closure;
 use CoStack\StackTest\Elements\Parallel\AbstractSelectable;
+use CoStack\StackTest\Elements\Parallel\Alert;
 use CoStack\StackTest\Elements\Parallel\Checkboxes;
 use CoStack\StackTest\Elements\Parallel\Element;
 use CoStack\StackTest\Elements\Parallel\Elements;
@@ -19,6 +20,7 @@ use Facebook\WebDriver\Exception\ElementNotInteractableException;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverCheckboxes;
+use Facebook\WebDriver\WebDriverElement;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\WebDriverRadios;
 use Facebook\WebDriver\WebDriverSelect;
@@ -26,8 +28,10 @@ use Facebook\WebDriver\WebDriverSelect;
 class Session
 {
     /** @param array<RemoteWebDriver> $drivers */
-    public function __construct(public readonly array $drivers)
-    {
+    public function __construct(
+        public readonly string $sessionId,
+        public readonly array $drivers,
+    ) {
     }
 
     public function get(string $url): void
@@ -221,22 +225,71 @@ JS;
         }
     }
 
-    protected function resolveWebDriverByForDriver(RemoteWebDriver $driver, array $arguments): array
+    protected function resolveWebDriverByForDriver(RemoteWebDriver $driver, mixed $argument): mixed
     {
-        $resolved = [];
-        foreach ($arguments as $index => $argument) {
-            if ($argument instanceof WebDriverBy) {
-                $argument = $driver->findElement($argument);
+        if (is_array($argument)) {
+            $resolved = [];
+            foreach ($argument as $index => $value) {
+                $resolved[$index] = $this->resolveWebDriverByForDriver($driver, $value);
             }
-            $resolved[$index] = $argument;
+            return $resolved;
         }
-        return $resolved;
+        if ($argument instanceof WebDriverBy) {
+            return $driver->findElement($argument);
+        }
+        return $argument;
     }
 
     public function __destruct()
     {
         foreach ($this->drivers as $driver) {
             $driver->quit();
+        }
+    }
+
+    public function inPopupContext(Closure $closure): void
+    {
+        foreach ($this->drivers as $driver) {
+            $alert = $driver->switchTo()->alert();
+            try {
+                $closure($driver, $alert);
+            } finally {
+                $driver->switchTo()->defaultContent();
+            }
+        }
+    }
+
+    public function refresh(): void
+    {
+        foreach ($this->drivers as $driver) {
+            $driver->navigate()->refresh();
+        }
+    }
+
+    public function forward(): void
+    {
+        foreach ($this->drivers as $driver) {
+            $driver->navigate()->forward();
+        }
+    }
+
+    public function back(): void
+    {
+        foreach ($this->drivers as $driver) {
+            $driver->navigate()->back();
+        }
+    }
+
+    public function inIFrameContext(WebDriverBy|WebDriverElement|null|int|string $frame, Closure $closure)
+    {
+        foreach ($this->drivers as $driver) {
+            $resolvedFrame = $this->resolveWebDriverByForDriver($driver, $frame);
+            try {
+                $driver->switchTo()->frame($resolvedFrame);
+                $closure($driver);
+            } finally {
+                $driver->switchTo()->defaultContent();
+            }
         }
     }
 }
