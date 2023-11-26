@@ -91,4 +91,9 @@ abstract class SessionConstrain extends Constraint
     }
 
     abstract protected function descriptionForDriver(RemoteWebDriver $driver, bool $exportObjects = false): string;
+
+    public function eval(mixed $other): bool
+    {
+        return $this->evaluate($other, returnResult: true);
+    }
 }
