@@ -35,5 +35,18 @@ class TYPO3Helper
                 'p_field' => $password,
             ]);
         }
+        self::waitUntilContentIFrameIsLoaded($session);
+    }
+
+    /**
+     * Can be replaced with but is more precise as:
+     * <code class="code">$session->click(WebDriverBy::linkText($text));</code>
+     */
+    public static function selectModuleByText(Session $session, string $text): void
+    {
+        $xpath = "//nav[@id='modulemenu']//span[@class='modulemenu-name' and text()='$text']/ancestor::a";
+        $moduleLink = $session->findElement(WebDriverBy::xpath($xpath));
+        $moduleLink->click();
+        self::waitUntilContentIFrameIsLoaded($session);
     }
 }
