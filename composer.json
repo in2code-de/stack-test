@@ -1,6 +1,7 @@
 {
   "name": "co-stack/stack-test",
   "description": "Testing Framework",
+  "license": "BSD-3-Clause",
   "authors": [
     {
       "name": "Oliver Eglseder",
