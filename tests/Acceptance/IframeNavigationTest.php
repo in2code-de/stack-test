@@ -13,7 +13,7 @@ class IframeNavigationTest extends BrowserTestCase
 {
     public function testSwitchToIframeAndBack(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/iframe.php');
 
         self::assertPageContains($session, 'Main frame');

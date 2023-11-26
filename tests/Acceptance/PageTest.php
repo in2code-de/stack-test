@@ -13,7 +13,7 @@ class PageTest extends BrowserTestCase
 {
     public function testPageTitle(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/form.php');
 
         self::assertPageTitleEquals($session, 'Testing Form for test-stack');
@@ -24,7 +24,7 @@ class PageTest extends BrowserTestCase
 
     public function testPageHistoryNavigation(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/test.php');
 
         self::assertCurrentUrlEquals($session, 'https://web.local.co-stack-test.com/test.php');

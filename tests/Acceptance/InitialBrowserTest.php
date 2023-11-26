@@ -14,7 +14,7 @@ class InitialBrowserTest extends BrowserTestCase
 {
     public function testOpeningUrl(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/test.php');
 
         self::assertPageContains($session, 'hi there');

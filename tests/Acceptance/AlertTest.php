@@ -6,7 +6,6 @@ namespace CoStack\StackTest\Tests\Acceptance;
 
 use CoStack\StackTest\BrowserTestCase;
 use CoStack\StackTest\Factory\SessionFactory;
-use CoStack\StackTest\Session;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverAlert;
 use Facebook\WebDriver\WebDriverBy;
@@ -15,7 +14,7 @@ class AlertTest extends BrowserTestCase
 {
     public function testAlertPopupTextCanBeTested(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/alert.php');
 
         $session->inPopupContext(function (RemoteWebDriver $driver, WebDriverAlert $alert): void {
@@ -27,7 +26,7 @@ class AlertTest extends BrowserTestCase
 
     public function testConfirmPopupCanBeAccepted(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/confirm.php');
 
         $session->inPopupContext(function (RemoteWebDriver $driver, WebDriverAlert $alert): void {
@@ -41,7 +40,7 @@ class AlertTest extends BrowserTestCase
 
     public function testConfirmPopupCanBeDismissed(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/confirm.php');
 
         $session->inPopupContext(function (RemoteWebDriver $driver, WebDriverAlert $alert): void {
@@ -55,7 +54,7 @@ class AlertTest extends BrowserTestCase
 
     public function testPromptPopupCanBeFilled(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/prompt.php');
 
         $session->inPopupContext(function (RemoteWebDriver $driver, WebDriverAlert $alert): void {
@@ -70,7 +69,7 @@ class AlertTest extends BrowserTestCase
 
     public function testPromptPopupCanBeCancelled(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/prompt.php');
 
         $session->inPopupContext(function (RemoteWebDriver $driver, WebDriverAlert $alert): void {

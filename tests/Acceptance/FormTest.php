@@ -16,7 +16,7 @@ class FormTest extends BrowserTestCase
 
     public function testInputWithoutNameCanBeFilled(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::xpath('/html/body/form[1]/fieldset[1]/label/input');
@@ -28,7 +28,7 @@ class FormTest extends BrowserTestCase
 
     public function testInputWithNameCanBeFoundAndSubmitted(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::name('name1');
@@ -44,7 +44,7 @@ class FormTest extends BrowserTestCase
 
     public function testInputWithIdCanBeFoundAndFilled(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::id('id1');
@@ -56,7 +56,7 @@ class FormTest extends BrowserTestCase
 
     public function testInputWithClassCanBeFoundAndFilled(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::className('class1');
@@ -68,7 +68,7 @@ class FormTest extends BrowserTestCase
 
     public function testInputWithDefaultValueCanBeFoundAndFilled(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::cssSelector('[value=value1]');
@@ -82,7 +82,7 @@ class FormTest extends BrowserTestCase
 
     public function testInputWithDefaultValueAndNameCanBeSubmitted(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::name('name2');
@@ -102,7 +102,7 @@ class FormTest extends BrowserTestCase
     {
         $this->expectException(HiddenInputCanNotBeFilledException::class);
 
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::name('name3');
@@ -112,7 +112,7 @@ class FormTest extends BrowserTestCase
 
     public function testHiddenInputCanBeSubmitted(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::name('name3');
@@ -128,7 +128,7 @@ class FormTest extends BrowserTestCase
 
     public function testCheckboxesCanBeSubmitted(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::name('check1[]');
@@ -155,7 +155,7 @@ class FormTest extends BrowserTestCase
 
     public function testRadiosCanBeSubmitted(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::name('radio1');
@@ -175,7 +175,7 @@ class FormTest extends BrowserTestCase
 
     public function testSelectSingleCanBeSubmitted(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::name('select1');
@@ -199,7 +199,7 @@ class FormTest extends BrowserTestCase
 
     public function testFormCanBeSubmittedWithValueData(): void
     {
-        $session = (new SessionFactory())->create('session1');
+        $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/form.php');
 
         $formSelector = WebDriverBy::name('form1');

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CoStack\StackTest\Factory;
 
 use CoStack\StackTest\Decorator\WebDriverDecorator;
+use CoStack\StackTest\Pattern\Singleton;
 use CoStack\StackTest\Recorder\WebDriverRecorder;
 use CoStack\StackTest\Session;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
@@ -14,12 +15,14 @@ use Facebook\WebDriver\WebDriver;
 
 class SessionFactory
 {
-    protected static array $sessions = [];
+    use Singleton;
+
+    protected array $sessions = [];
 
     public function create(string $sessionId = null, string $seleniumUrl = 'http://selenium-hub:4444'): Session
     {
         $sessionId ??= bin2hex(random_bytes(16));
-        return self::$sessions[$sessionId] ??= new Session($sessionId, [
+        return $this->sessions[$sessionId] ??= new Session($sessionId, [
             'chrome' => $this->createChromeDriver($seleniumUrl),
             'firefox' => $this->createFirefoxDriver($seleniumUrl),
         ]);
