@@ -49,6 +49,8 @@ use CoStack\StackTest\Test\Constraint\Page\Title\PageTitleNotContains;
 use CoStack\StackTest\Test\Constraint\Page\Title\PageTitleNotEquals;
 use CoStack\StackTest\Test\Constraint\Source\SourceContains;
 use CoStack\StackTest\Test\Constraint\Source\SourceNotContains;
+use CoStack\StackTest\Test\Constraint\Visibility\ElementIsNotVisible;
+use CoStack\StackTest\Test\Constraint\Visibility\ElementIsVisible;
 use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
@@ -290,5 +292,15 @@ abstract class BrowserTestCase extends TestCase
     protected static function assertSourceNotContains(Session|RemoteWebDriver $session, string $string): void
     {
         self::assertThat($string, new SourceNotContains($session));
+    }
+
+    protected static function assertElementIsNotVisible(Session|RemoteWebDriver $session, WebDriverBy $selector): void
+    {
+        self::assertThat($selector, new ElementIsNotVisible($session));
+    }
+
+    protected static function assertElementIsVisible(Session|RemoteWebDriver $session, WebDriverBy $selector): void
+    {
+        self::assertThat($selector, new ElementIsVisible($session));
     }
 }

@@ -34,6 +34,13 @@ class Session
     ) {
     }
 
+    public function inEachBrowser(Closure $closure): void
+    {
+        foreach ($this->drivers as $driver) {
+            $closure($driver);
+        }
+    }
+
     public function get(string $url): void
     {
         foreach ($this->drivers as $driver) {
