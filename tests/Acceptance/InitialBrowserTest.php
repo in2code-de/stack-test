@@ -23,7 +23,7 @@ class InitialBrowserTest extends BrowserTestCase
         $cookie->setSecure(true);
         $session->setCookie($cookie);
 
-        self::assertSetCookieIsEqual($session, $cookie);
+        self::assertCookieIsEqual($session, $cookie);
 
         self::assertPageNotContains($session, 'hella');
 

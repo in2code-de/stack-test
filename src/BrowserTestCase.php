@@ -11,8 +11,10 @@ use CoStack\StackTest\Test\Constraint\Content\ElementNotContains;
 use CoStack\StackTest\Test\Constraint\Content\ElementNotEquals;
 use CoStack\StackTest\Test\Constraint\Content\PageContains;
 use CoStack\StackTest\Test\Constraint\Content\PageNotContains;
-use CoStack\StackTest\Test\Constraint\Cookie\SetCookieIsEqual;
-use CoStack\StackTest\Test\Constraint\Cookie\SetCookieIsSame;
+use CoStack\StackTest\Test\Constraint\Cookie\CookieIsEqual;
+use CoStack\StackTest\Test\Constraint\Cookie\CookieIsNotSet;
+use CoStack\StackTest\Test\Constraint\Cookie\CookieIsSame;
+use CoStack\StackTest\Test\Constraint\Cookie\CookieIsSet;
 use CoStack\StackTest\Test\Constraint\CurrentUrl\CurrentUrlContains;
 use CoStack\StackTest\Test\Constraint\CurrentUrl\CurrentUrlEquals;
 use CoStack\StackTest\Test\Constraint\CurrentUrl\CurrentUrlNotContains;
@@ -100,14 +102,24 @@ abstract class BrowserTestCase extends TestCase
         self::assertThat($string, new PageNotContains($session));
     }
 
-    protected static function assertSetCookieIsEqual(Session|RemoteWebDriver $session, Cookie $cookie): void
+    protected static function assertCookieIsEqual(Session|RemoteWebDriver $session, Cookie $cookie): void
     {
-        self::assertThat($cookie, new SetCookieIsEqual($session));
+        self::assertThat($cookie, new CookieIsEqual($session));
     }
 
-    protected static function assertSetCookieIsSame(Session|RemoteWebDriver $session, Cookie $cookie): void
+    protected static function assertCookieIsSet(Session|RemoteWebDriver $session, Cookie|string $cookie): void
     {
-        self::assertThat($cookie, new SetCookieIsSame($session));
+        self::assertThat($cookie, new CookieIsSet($session));
+    }
+
+    protected static function assertCookieIsSame(Session|RemoteWebDriver $session, Cookie $cookie): void
+    {
+        self::assertThat($cookie, new CookieIsSame($session));
+    }
+
+    protected static function assertCookieIsNotSet(Session|RemoteWebDriver $session, Cookie|string $cookie): void
+    {
+        self::assertThat($cookie, new CookieIsNotSet($session));
     }
 
     protected static function assertCurrentUrlContains(Session|RemoteWebDriver $session, string $string): void

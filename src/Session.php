@@ -15,9 +15,12 @@ use CoStack\StackTest\Elements\Parallel\Radios;
 use CoStack\StackTest\Elements\Parallel\Select;
 use CoStack\StackTest\Elements\Single\Form;
 use CoStack\StackTest\Exception\HiddenInputCanNotBeFilledException;
+use CoStack\StackTest\Routines\Reset\ChromeReset;
+use CoStack\StackTest\Routines\Reset\FirefoxReset;
 use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\Exception\ElementNotInteractableException;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\Remote\WebDriverBrowserType;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverCheckboxes;
 use Facebook\WebDriver\WebDriverElement;
@@ -32,6 +35,24 @@ class Session
         public readonly string $sessionId,
         public readonly array $drivers,
     ) {
+    }
+
+    /**
+     * Deletes all cookies and browser history.
+     * This method should be faster than creating a new session for each test.
+     */
+    public function reset(): void
+    {
+        foreach ($this->drivers as $driver) {
+            $browserName = $driver->getCapabilities()->getBrowserName();
+            if (WebDriverBrowserType::CHROME === $browserName) {
+                $routine = new ChromeReset();
+                $routine->execute($driver);
+            }if (WebDriverBrowserType::FIREFOX === $browserName) {
+                $routine = new FirefoxReset();
+                $routine->execute($driver);
+            }
+        }
     }
 
     public function inEachBrowser(Closure $closure): void
@@ -58,6 +79,19 @@ class Session
         }
     }
 
+    public function deleteCookie(Cookie|string $cookieOrName): void
+    {
+        if ($cookieOrName instanceof Cookie) {
+            $cookieOrName = $cookieOrName->getName();
+        }
+        foreach ($this->drivers as $driver) {
+            $driver->manage()->deleteCookieNamed($cookieOrName);
+        }
+    }
+
+    /**
+     * Shorthand for <code class="code">$session->findElement($selector)->click();</code>
+     */
     public function click(WebDriverBy $selector): void
     {
         foreach ($this->drivers as $driver) {

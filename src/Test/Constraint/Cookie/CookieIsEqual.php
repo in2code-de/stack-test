@@ -12,7 +12,7 @@ use PHPUnit\Util\Exporter;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Comparator\Factory as ComparatorFactory;
 
-class SetCookieIsEqual extends SessionConstrain
+class CookieIsEqual extends SessionConstrain
 {
     protected ?array $setCookie = null;
 

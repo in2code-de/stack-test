@@ -10,7 +10,7 @@ use Facebook\WebDriver\Remote\RemoteWebDriver;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Comparator\Factory as ComparatorFactory;
 
-class SetCookieIsSame extends SetCookieIsEqual
+class CookieIsSame extends CookieIsEqual
 {
     protected ?array $setCookie = null;
 
