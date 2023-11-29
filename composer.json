@@ -2,6 +2,17 @@
   "name": "co-stack/stack-test",
   "description": "Testing Framework",
   "license": "BSD-3-Clause",
+  "type": "library",
+  "keywords": [
+    "test",
+    "testing",
+    "selenium",
+    "phpunit",
+    "codeception",
+    "behat",
+    "acceptance",
+    "browser"
+  ],
   "authors": [
     {
       "name": "Oliver Eglseder",
