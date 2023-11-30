@@ -4,28 +4,34 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\TYPO3;
 
-use CoStack\StackTest\Test\Constraint\Existence\ElementNotExists;
+use Closure;
+use CoStack\StackTest\Session\Session;
+use CoStack\StackTest\Test\Constraint\Existence\ElementExists;
+use CoStack\StackTest\Test\Constraint\Visibility\ElementIsNotVisible;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsVisible;
-use Facebook\WebDriver\WebDriver;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 
 class TYPO3ExpectedCondition extends WebDriverExpectedCondition
 {
-    public static function contentIFrameIsLoaded(): static
+    public static function contentIFrameIsLoaded(): Closure
     {
-        return new static(static function (WebDriver $driver): bool {
-            $constraint = new ElementIsVisible($driver);
-            return $constraint->eval(WebDriverBy::id('typo3-contentIframe'))
-                && !$constraint->eval(WebDriverBy::id('nprogress'));
-        });
+        return static function (Session|RemoteWebDriver $driver): bool {
+            return ElementIsVisible::resolve(WebDriverBy::id('typo3-contentIframe'))($driver)
+                && ElementIsNotVisible::resolve(WebDriverBy::id('nprogress'))($driver);
+        };
     }
 
-    public static function pageTreeIsLoaded(): static
+    public static function pageTreeIsLoaded(): Closure
     {
-        return new static(static function (WebDriver $driver): bool {
-            $constraint = new ElementNotExists($driver);
-            return $constraint->eval(WebDriverBy::className('svg-tree-loader'));
-        });
+        $selector = WebDriverBy::className('svg-tree-loader');
+        $svgTreeLoaderExists = ElementExists::resolve($selector);
+        $svgTreeLoaderIsNotVisible = ElementIsNotVisible::resolve($selector);
+
+        return static function (Session|RemoteWebDriver $session) use ($svgTreeLoaderExists, $svgTreeLoaderIsNotVisible): bool {
+            return $svgTreeLoaderExists($session)
+                && $svgTreeLoaderIsNotVisible($session);
+        };
     }
 }

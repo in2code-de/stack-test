@@ -15,7 +15,7 @@ class LinkNotExists extends SessionConstrain
     {
         try {
             $driver->findElement(WebDriverBy::partialLinkText($other));
-        } catch (NoSuchElementException) {
+        } catch (NoSuchElementException|UnexpectedResponseException) {
             return true;
         }
         return false;

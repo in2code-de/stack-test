@@ -1,15 +1,28 @@
 <?php
 
+/**
+ * @noinspection PhpUnnecessaryLocalVariableInspection
+ * @noinspection OneTimeUseVariablesInspection
+ */
+
 declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint;
 
-use CoStack\StackTest\Session;
+use Closure;
+use CoStack\StackTest\Session\Session;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverElement;
 use PHPUnit\Framework\Constraint\Constraint;
+
+use function debug_backtrace;
+use function implode;
+use function in_array;
+use function is_array;
+
+use const DEBUG_BACKTRACE_IGNORE_ARGS;
 
 abstract class SessionConstrain extends Constraint
 {
@@ -20,10 +33,26 @@ abstract class SessionConstrain extends Constraint
     ) {
     }
 
+    public static function resolve(mixed $other): Closure
+    {
+        return static function (Session|RemoteWebDriver $session) use ($other): bool {
+            $constraint = new static($session);
+            $result = $constraint->eval($other);
+            return $result;
+        };
+    }
+
+    public function eval(mixed $other): bool
+    {
+        $result = $this->evaluate($other, returnResult: true);
+        return $result;
+    }
+
     protected function resolveSelectorsInOtherToText(WebDriver $driver, mixed $other): mixed
     {
         if ($other instanceof WebDriverBy) {
-            $other = $driver->findElement($other)->getText();
+            $element = $driver->findElement($other);
+            $other = $element->getText();
         }
         if (is_array($other)) {
             foreach ($other as $index => $value) {
@@ -36,7 +65,8 @@ abstract class SessionConstrain extends Constraint
     protected function resolveSelectorsInOtherToValue(WebDriver $driver, mixed $other): mixed
     {
         if ($other instanceof WebDriverBy) {
-            $other = $driver->findElement($other)->getAttribute('value');
+            $element = $driver->findElement($other);
+            $other = $element->getAttribute('value');
         }
         if (is_array($other)) {
             foreach ($other as $index => $value) {
@@ -91,9 +121,4 @@ abstract class SessionConstrain extends Constraint
     }
 
     abstract protected function descriptionForDriver(RemoteWebDriver $driver, bool $exportObjects = false): string;
-
-    public function eval(mixed $other): bool
-    {
-        return $this->evaluate($other, returnResult: true);
-    }
 }

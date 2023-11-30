@@ -6,7 +6,7 @@ namespace CoStack\StackTest\Tests\Acceptance;
 
 use CoStack\StackTest\BrowserTestCase;
 use CoStack\StackTest\Factory\SessionFactory;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
+use CoStack\StackTest\Session\Session;
 use Facebook\WebDriver\WebDriverBy;
 
 class IframeNavigationTest extends BrowserTestCase
@@ -20,12 +20,12 @@ class IframeNavigationTest extends BrowserTestCase
         self::assertPageNotContains($session, 'Eye frame');
         self::assertCurrentUrlEquals($session, 'https://web.local.co-stack-test.com/iframe.php');
 
-        $session->inIFrameContext(WebDriverBy::id('content-iframe'), function (RemoteWebDriver $driver): void {
-            self::assertPageContains($driver, 'Eye frame');
-            self::assertPageNotContains($driver, 'Main Frame');
-            self::assertPageNotContains($driver, 'Eye frame two');
-            $driver->findElement(WebDriverBy::linkText('content 2'))->click();
-            self::assertPageContains($driver, 'Eye frame two');
+        $session->inIFrameContext(WebDriverBy::id('content-iframe'), function (Session $session): void {
+            self::assertPageContains($session, 'Eye frame');
+            self::assertPageNotContains($session, 'Main Frame');
+            self::assertPageNotContains($session, 'Eye frame two');
+            $session->click(WebDriverBy::linkText('content 2'));
+            self::assertPageContains($session, 'Eye frame two');
         });
 
         self::assertPageContains($session, 'Main frame');

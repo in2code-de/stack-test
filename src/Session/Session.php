@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace CoStack\StackTest;
+namespace CoStack\StackTest\Session;
 
 use Closure;
+use CoStack\StackTest\Decorator\SessionWait;
 use CoStack\StackTest\Elements\Parallel\AbstractSelectable;
-use CoStack\StackTest\Elements\Parallel\Alert;
 use CoStack\StackTest\Elements\Parallel\Checkboxes;
 use CoStack\StackTest\Elements\Parallel\Element;
 use CoStack\StackTest\Elements\Parallel\Elements;
@@ -28,6 +28,10 @@ use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\WebDriverRadios;
 use Facebook\WebDriver\WebDriverSelect;
 
+use function array_key_first;
+use function is_string;
+use function str_starts_with;
+
 class Session
 {
     /** @param array<RemoteWebDriver> $drivers */
@@ -35,6 +39,17 @@ class Session
         public readonly string $sessionId,
         public readonly array $drivers,
     ) {
+    }
+
+    /**
+     * Elevates a driver to a session
+     */
+    public static function elevate(Session|RemoteWebDriver $driver): Session
+    {
+        if ($driver instanceof Session) {
+            return $driver;
+        }
+        return new ElevatedSession($driver);
     }
 
     /**
@@ -48,18 +63,37 @@ class Session
             if (WebDriverBrowserType::CHROME === $browserName) {
                 $routine = new ChromeReset();
                 $routine->execute($driver);
-            }if (WebDriverBrowserType::FIREFOX === $browserName) {
+            }
+            if (WebDriverBrowserType::FIREFOX === $browserName) {
                 $routine = new FirefoxReset();
                 $routine->execute($driver);
             }
         }
     }
 
+    /**
+     * Close all browser windows, but not the session
+     */
+    public function close(): void
+    {
+        foreach ($this->drivers as $driver) {
+            $driver->close();
+        }
+    }
+
     public function inEachBrowser(Closure $closure): void
     {
         foreach ($this->drivers as $driver) {
-            $closure($driver);
+            $subSession = $this->createSubSessionForSingleDriver($driver);
+            $closure($subSession);
         }
+    }
+
+    public function inOneBrowser(Closure $closure, string $preferredBrowser = null): void
+    {
+        $selectedDriver = $this->getDriverForBrowser($preferredBrowser);
+        $subSession = $this->createSubSessionForSingleDriver($selectedDriver);
+        $closure($subSession);
     }
 
     public function get(string $url): void
@@ -92,10 +126,23 @@ class Session
     /**
      * Shorthand for <code class="code">$session->findElement($selector)->click();</code>
      */
-    public function click(WebDriverBy $selector): void
+    public function click(string|WebDriverBy $linkTextOrSelector): void
+    {
+        if (is_string($linkTextOrSelector)) {
+            $linkTextOrSelector = WebDriverBy::linkText($linkTextOrSelector);
+        }
+        foreach ($this->drivers as $driver) {
+            $driver->findElement($linkTextOrSelector)->click();
+        }
+    }
+
+    /**
+     * Shorthand for <code class="code">$session->findElement($selector)->submit();</code>
+     */
+    public function submit(WebDriverBy $selector): void
     {
         foreach ($this->drivers as $driver) {
-            $driver->findElement($selector)->click();
+            $driver->findElement($selector)->submit();
         }
     }
 
@@ -259,10 +306,15 @@ JS;
         }
     }
 
+    /**
+     * Shorthand for <code class='code'>$driver->wait()->until($condition);</code>
+     */
     public function waitUntil(Closure|WebDriverExpectedCondition $condition): void
     {
         foreach ($this->drivers as $driver) {
-            $driver->wait()->until($condition);
+            $session = $this->createSubSessionForSingleDriver($driver);
+            $wait = new SessionWait($session);
+            $wait->until($condition);
         }
     }
 
@@ -291,9 +343,10 @@ JS;
     public function inPopupContext(Closure $closure): void
     {
         foreach ($this->drivers as $driver) {
+            $subSession = $this->createSubSessionForSingleDriver($driver);
             $alert = $driver->switchTo()->alert();
             try {
-                $closure($driver, $alert);
+                $closure($subSession, $alert);
             } finally {
                 $driver->switchTo()->defaultContent();
             }
@@ -321,16 +374,43 @@ JS;
         }
     }
 
-    public function inIFrameContext(WebDriverBy|WebDriverElement|null|int|string $frame, Closure $closure)
+    public function inIFrameContext(WebDriverBy|WebDriverElement|null|int|string $frame, Closure $closure): void
     {
         foreach ($this->drivers as $driver) {
+            $subSession = $this->createSubSessionForSingleDriver($driver);
             $resolvedFrame = $this->resolveWebDriverByForDriver($driver, $frame);
             try {
                 $driver->switchTo()->frame($resolvedFrame);
-                $closure($driver);
+                $closure($subSession);
             } finally {
                 $driver->switchTo()->defaultContent();
             }
         }
+    }
+
+    public function createSubSessionForSingleDriver(RemoteWebDriver $driver): Session
+    {
+        return new SubSession($this, $driver);
+    }
+
+    /**
+     * @internal You should always use the Session object. Use `createSubSessionForSingleDriver` instead.
+     */
+    public function getDriverForBrowser(?string $preferredBrowser = null): RemoteWebDriver
+    {
+        $selectedDriver = null;
+        if (null !== $preferredBrowser) {
+            foreach ($this->drivers as $driver) {
+                if ($driver->getCapabilities()->getBrowserName() === $preferredBrowser) {
+                    $selectedDriver = $driver;
+                    break;
+                }
+            }
+        }
+        if (null === $selectedDriver) {
+            $key = array_key_first($this->drivers);
+            $selectedDriver = $this->drivers[$key];
+        }
+        return $selectedDriver;
     }
 }

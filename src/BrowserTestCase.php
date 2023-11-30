@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CoStack\StackTest;
 
 use CoStack\StackTest\Elements\Parallel\Alert;
+use CoStack\StackTest\Session\Session;
 use CoStack\StackTest\Test\Constraint\Content\ElementContains;
 use CoStack\StackTest\Test\Constraint\Content\ElementEquals;
 use CoStack\StackTest\Test\Constraint\Content\ElementNotContains;

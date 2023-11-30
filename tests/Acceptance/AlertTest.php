@@ -6,7 +6,7 @@ namespace CoStack\StackTest\Tests\Acceptance;
 
 use CoStack\StackTest\BrowserTestCase;
 use CoStack\StackTest\Factory\SessionFactory;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
+use CoStack\StackTest\Session\Session;
 use Facebook\WebDriver\WebDriverAlert;
 use Facebook\WebDriver\WebDriverBy;
 
@@ -17,7 +17,7 @@ class AlertTest extends BrowserTestCase
         $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/alert.php');
 
-        $session->inPopupContext(function (RemoteWebDriver $driver, WebDriverAlert $alert): void {
+        $session->inPopupContext(function (Session $session, WebDriverAlert $alert): void {
             $text = $alert->getText();
             self::assertSame('Test alert Message', $text);
             $alert->accept();
@@ -29,7 +29,7 @@ class AlertTest extends BrowserTestCase
         $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/confirm.php');
 
-        $session->inPopupContext(function (RemoteWebDriver $driver, WebDriverAlert $alert): void {
+        $session->inPopupContext(function (Session $session, WebDriverAlert $alert): void {
             $text = $alert->getText();
             self::assertSame('Test confirm Message', $text);
             $alert->accept();
@@ -43,7 +43,7 @@ class AlertTest extends BrowserTestCase
         $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/confirm.php');
 
-        $session->inPopupContext(function (RemoteWebDriver $driver, WebDriverAlert $alert): void {
+        $session->inPopupContext(function (Session $session, WebDriverAlert $alert): void {
             $text = $alert->getText();
             self::assertSame('Test confirm Message', $text);
             $alert->dismiss();
@@ -57,7 +57,7 @@ class AlertTest extends BrowserTestCase
         $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/prompt.php');
 
-        $session->inPopupContext(function (RemoteWebDriver $driver, WebDriverAlert $alert): void {
+        $session->inPopupContext(function (Session $session, WebDriverAlert $alert): void {
             $text = $alert->getText();
             self::assertSame('Enter your test message', $text);
             $alert->sendKeys('My test string 1');
@@ -72,7 +72,7 @@ class AlertTest extends BrowserTestCase
         $session = SessionFactory::getInstance()->create('session1');
         $session->get('https://web.local.co-stack-test.com/prompt.php');
 
-        $session->inPopupContext(function (RemoteWebDriver $driver, WebDriverAlert $alert): void {
+        $session->inPopupContext(function (Session $session, WebDriverAlert $alert): void {
             $text = $alert->getText();
             self::assertSame('Enter your test message', $text);
             $alert->sendKeys('My test string 1');

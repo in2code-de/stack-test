@@ -15,7 +15,7 @@ class ElementIsVisible extends SessionConstrain
         try {
             $element = $driver->findElement($other);
             return $element->isDisplayed();
-        } catch (NoSuchElementException) {
+        } catch (NoSuchElementException|UnexpectedResponseException) {
             return false;
         }
     }

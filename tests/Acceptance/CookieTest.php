@@ -6,7 +6,7 @@ namespace CoStack\StackTest\Tests\Acceptance;
 
 use CoStack\StackTest\BrowserTestCase;
 use CoStack\StackTest\Factory\SessionFactory;
-use CoStack\StackTest\Session;
+use CoStack\StackTest\Session\Session;
 use Facebook\WebDriver\Cookie;
 
 class CookieTest extends BrowserTestCase

@@ -14,7 +14,7 @@ class ElementExists extends SessionConstrain
     {
         try {
             $driver->findElement($other);
-        } catch (NoSuchElementException) {
+        } catch (NoSuchElementException|UnexpectedResponseException) {
             return false;
         }
         return true;

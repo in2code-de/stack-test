@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint;
 
-use CoStack\StackTest\Session;
+use CoStack\StackTest\Session\Session;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 

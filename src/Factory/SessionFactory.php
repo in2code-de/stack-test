@@ -7,7 +7,7 @@ namespace CoStack\StackTest\Factory;
 use CoStack\StackTest\Decorator\WebDriverDecorator;
 use CoStack\StackTest\Pattern\Singleton;
 use CoStack\StackTest\Recorder\WebDriverRecorder;
-use CoStack\StackTest\Session;
+use CoStack\StackTest\Session\Session;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\WebDriverCapabilityType;
@@ -33,6 +33,7 @@ class SessionFactory
         $desiredCapabilities = DesiredCapabilities::chrome();
         $desiredCapabilities->setCapability(WebDriverCapabilityType::ACCEPT_SSL_CERTS, true);
         $driver = RemoteWebDriver::create($seleniumUrl, $desiredCapabilities);
+        $driver->manage()->window()->maximize();
         return new WebDriverDecorator($driver, WebDriverRecorder::getInstance());
     }
 
@@ -41,6 +42,7 @@ class SessionFactory
         $desiredCapabilities = DesiredCapabilities::firefox();
         $desiredCapabilities->setCapability(WebDriverCapabilityType::ACCEPT_SSL_CERTS, true);
         $driver = RemoteWebDriver::create($seleniumUrl, $desiredCapabilities);
+        $driver->manage()->window()->maximize();
         return new WebDriverDecorator($driver, WebDriverRecorder::getInstance());
     }
 }

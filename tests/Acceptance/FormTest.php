@@ -8,7 +8,6 @@ use CoStack\StackTest\BrowserTestCase;
 use CoStack\StackTest\Elements\Parallel\Select;
 use CoStack\StackTest\Exception\HiddenInputCanNotBeFilledException;
 use CoStack\StackTest\Factory\SessionFactory;
-use CoStack\StackTest\Session;
 use Facebook\WebDriver\WebDriverBy;
 
 class FormTest extends BrowserTestCase
