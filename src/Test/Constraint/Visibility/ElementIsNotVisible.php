@@ -6,6 +6,7 @@ namespace CoStack\StackTest\Test\Constraint\Visibility;
 
 use CoStack\StackTest\Test\Constraint\SessionConstrain;
 use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 
 class ElementIsNotVisible extends SessionConstrain
@@ -14,8 +15,9 @@ class ElementIsNotVisible extends SessionConstrain
     {
         try {
             $element = $driver->findElement($other);
-            return !$element->isDisplayed();
-        } catch (NoSuchElementException|UnexpectedResponseException) {
+            $result = !$element->isDisplayed();
+            return $result;
+        } catch (NoSuchElementException|StaleElementReferenceException) {
             return true;
         }
     }

@@ -10,7 +10,7 @@ use Facebook\WebDriver\WebDriverElement;
 class Element
 {
     /** @param array<string, WebDriverElement> $elementPerDriver */
-    public function __construct(protected array $elementPerDriver)
+    public function __construct(public array $elementPerDriver)
     {
     }
 

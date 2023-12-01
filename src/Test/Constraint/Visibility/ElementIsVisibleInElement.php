@@ -2,30 +2,31 @@
 
 declare(strict_types=1);
 
-namespace CoStack\StackTest\Test\Constraint\Existence;
+namespace CoStack\StackTest\Test\Constraint\Visibility;
 
-use CoStack\StackTest\Test\Constraint\SessionConstrain;
-use Facebook\WebDriver\Exception\Internal\UnexpectedResponseException;
+use CoStack\StackTest\Test\Constraint\SessionWithSelectorConstraint;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\StaleElementReferenceException;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 
-class ElementNotExists extends SessionConstrain
+class ElementIsVisibleInElement extends SessionWithSelectorConstraint
 {
     protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
     {
         try {
-            $driver->findElement($other);
+            $element = $driver->findElement($this->selector);
+            $childElement = $element->findElement($other);
+            $result = $childElement->isDisplayed();
+            return $result;
         } catch (NoSuchElementException|StaleElementReferenceException) {
-            return true;
+            return false;
         }
-        return false;
     }
 
     protected function descriptionForDriver(RemoteWebDriver $driver, bool $exportObjects = false): string
     {
         return sprintf(
-            'not exists on page %s in %s',
+            'is visible on page %s in browser %s',
             $driver->getCurrentURL(),
             $driver->getCapabilities()->getBrowserName(),
         );

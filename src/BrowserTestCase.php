@@ -54,6 +54,7 @@ use CoStack\StackTest\Test\Constraint\Source\SourceContains;
 use CoStack\StackTest\Test\Constraint\Source\SourceNotContains;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsNotVisible;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsVisible;
+use CoStack\StackTest\Test\Constraint\Visibility\ElementIsVisibleInElement;
 use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
@@ -315,5 +316,13 @@ abstract class BrowserTestCase extends TestCase
     protected static function assertElementIsVisible(Session|RemoteWebDriver $session, WebDriverBy $selector): void
     {
         self::assertThat($selector, new ElementIsVisible($session));
+    }
+
+    protected static function assertElementIsVisibleInElement(
+        Session|RemoteWebDriver $session,
+        WebDriverBy $childSelector,
+        WebDriverBy $parentSelector,
+    ): void {
+        self::assertThat($childSelector, new ElementIsVisibleInElement($session, $parentSelector));
     }
 }

@@ -17,8 +17,10 @@ use CoStack\StackTest\Elements\Single\Form;
 use CoStack\StackTest\Exception\HiddenInputCanNotBeFilledException;
 use CoStack\StackTest\Routines\Reset\ChromeReset;
 use CoStack\StackTest\Routines\Reset\FirefoxReset;
+use Exception;
 use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\Exception\ElementNotInteractableException;
+use Facebook\WebDriver\Exception\InvalidSessionIdException;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\WebDriverBrowserType;
 use Facebook\WebDriver\WebDriverBy;
@@ -29,16 +31,25 @@ use Facebook\WebDriver\WebDriverRadios;
 use Facebook\WebDriver\WebDriverSelect;
 
 use function array_key_first;
+use function implode;
+use function in_array;
 use function is_string;
-use function str_starts_with;
 
 class Session
 {
+    /** @var array<string, RemoteWebDriver> */
+    public readonly array $drivers;
+
     /** @param array<RemoteWebDriver> $drivers */
     public function __construct(
         public readonly string $sessionId,
-        public readonly array $drivers,
+        array $drivers,
     ) {
+        $driversByBrowserName = [];
+        foreach ($drivers as $driver) {
+            $driversByBrowserName[$driver->getCapabilities()->getBrowserName()] = $driver;
+        }
+        $this->drivers = $driversByBrowserName;
     }
 
     /**
@@ -58,8 +69,7 @@ class Session
      */
     public function reset(): void
     {
-        foreach ($this->drivers as $driver) {
-            $browserName = $driver->getCapabilities()->getBrowserName();
+        foreach ($this->drivers as $browserName => $driver) {
             if (WebDriverBrowserType::CHROME === $browserName) {
                 $routine = new ChromeReset();
                 $routine->execute($driver);
@@ -77,7 +87,12 @@ class Session
     public function close(): void
     {
         foreach ($this->drivers as $driver) {
-            $driver->close();
+            try {
+                $driver->close();
+                $driver->switchTo()->defaultContent();
+            } catch (InvalidSessionIdException) {
+                // Ignore errors when calling close multiple times
+            }
         }
     }
 
@@ -204,8 +219,7 @@ JS;
     public function getFormElement(WebDriverBy $selector): FormElement
     {
         $elements = [];
-        foreach ($this->drivers as $driver) {
-            $browserName = $driver->getCapabilities()->getBrowserName();
+        foreach ($this->drivers as $browserName => $driver) {
             $element = $driver->findElement($selector);
             $webDriverFormElement = match ($element->getTagName()) {
                 'select' => new WebDriverSelect($element),
@@ -222,8 +236,7 @@ JS;
     public function getCheckboxes(WebDriverBy $selector): Checkboxes
     {
         $checkboxes = [];
-        foreach ($this->drivers as $driver) {
-            $browserName = $driver->getCapabilities()->getBrowserName();
+        foreach ($this->drivers as $browserName => $driver) {
             $element = $driver->findElement($selector);
             $checkboxes[$browserName] = new WebDriverCheckboxes($element);
         }
@@ -233,8 +246,7 @@ JS;
     public function getRadios(WebDriverBy $selector): Radios
     {
         $radios = [];
-        foreach ($this->drivers as $driver) {
-            $browserName = $driver->getCapabilities()->getBrowserName();
+        foreach ($this->drivers as $browserName => $driver) {
             $element = $driver->findElement($selector);
             $radios[$browserName] = new WebDriverRadios($element);
         }
@@ -244,8 +256,7 @@ JS;
     public function getSelect(WebDriverBy $selector): Select
     {
         $selects = [];
-        foreach ($this->drivers as $driver) {
-            $browserName = $driver->getCapabilities()->getBrowserName();
+        foreach ($this->drivers as $browserName => $driver) {
             $element = $driver->findElement($selector);
             $selects[$browserName] = new WebDriverSelect($element);
         }
@@ -273,8 +284,7 @@ JS;
     public function findElement(WebDriverBy $selector): Element
     {
         $elementPerDriver = [];
-        foreach ($this->drivers as $driver) {
-            $browserName = $driver->getCapabilities()->getBrowserName();
+        foreach ($this->drivers as $browserName => $driver) {
             $elementPerDriver[$browserName] = $driver->findElement($selector);
         }
         return new Element($elementPerDriver);
@@ -283,8 +293,7 @@ JS;
     public function findElements(WebDriverBy $selector): Elements
     {
         $elementsPerDriver = [];
-        foreach ($this->drivers as $driver) {
-            $browserName = $driver->getCapabilities()->getBrowserName();
+        foreach ($this->drivers as $browserName => $driver) {
             $elementsPerDriver[$browserName] = $driver->findElements($selector);
         }
         return new Elements($elementsPerDriver);
@@ -374,6 +383,22 @@ JS;
         }
     }
 
+    public function isInIFrameContext(): bool
+    {
+        $results = [];
+        foreach ($this->drivers as $browserName => $driver) {
+            $results[$browserName] = $driver->executeScript('return window.self !== window.top;');
+        }
+        if (in_array(true, $results, true) && in_array(false, $results, true)) {
+            $msg = [];
+            foreach ($results as $browserName => $result) {
+                $msg[] = $browserName . '=' . ($result ? 'true' : 'false');
+            }
+            throw new Exception('Got different results for browsers: ' . implode(' ', $msg));
+        }
+        return in_array(true, $results, true);
+    }
+
     public function inIFrameContext(WebDriverBy|WebDriverElement|null|int|string $frame, Closure $closure): void
     {
         foreach ($this->drivers as $driver) {
@@ -400,17 +425,30 @@ JS;
     {
         $selectedDriver = null;
         if (null !== $preferredBrowser) {
-            foreach ($this->drivers as $driver) {
-                if ($driver->getCapabilities()->getBrowserName() === $preferredBrowser) {
-                    $selectedDriver = $driver;
-                    break;
-                }
-            }
+            $selectedDriver = $this->drivers[$preferredBrowser] ?? null;
         }
         if (null === $selectedDriver) {
             $key = array_key_first($this->drivers);
             $selectedDriver = $this->drivers[$key];
         }
         return $selectedDriver;
+    }
+
+    public function contextClickElement(Element $element): void
+    {
+        foreach ($element->elementPerDriver as $browserName => $driverElement) {
+            $actions = $this->drivers[$browserName]->action();
+            $actions->contextClick($driverElement);
+            $actions->perform();
+        }
+    }
+
+    public function actOnElement(Element $element, Closure $closure): void
+    {
+        foreach ($element->elementPerDriver as $browserName => $driverElement) {
+            $driver = $this->drivers[$browserName];
+            $subSession = $this->createSubSessionForSingleDriver($driver);
+            $closure($subSession, $driverElement);
+        }
     }
 }

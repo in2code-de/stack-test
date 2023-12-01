@@ -6,6 +6,7 @@ namespace CoStack\StackTest\Test\Constraint\Existence;
 
 use CoStack\StackTest\Test\Constraint\SessionConstrain;
 use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 
@@ -15,7 +16,7 @@ class LinkExists extends SessionConstrain
     {
         try {
             $driver->findElement(WebDriverBy::partialLinkText($other));
-        } catch (NoSuchElementException|UnexpectedResponseException) {
+        } catch (NoSuchElementException|StaleElementReferenceException) {
             return false;
         }
         return true;

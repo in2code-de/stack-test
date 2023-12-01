@@ -17,6 +17,7 @@ class SessionFactory
 {
     use Singleton;
 
+    /** @var array<Session> */
     protected array $sessions = [];
 
     public function create(string $sessionId = null, string $seleniumUrl = 'http://selenium-hub:4444'): Session
@@ -24,7 +25,7 @@ class SessionFactory
         $sessionId ??= bin2hex(random_bytes(16));
         return $this->sessions[$sessionId] ??= new Session($sessionId, [
             'chrome' => $this->createChromeDriver($seleniumUrl),
-            'firefox' => $this->createFirefoxDriver($seleniumUrl),
+//            'firefox' => $this->createFirefoxDriver($seleniumUrl),
         ]);
     }
 
@@ -44,5 +45,12 @@ class SessionFactory
         $driver = RemoteWebDriver::create($seleniumUrl, $desiredCapabilities);
         $driver->manage()->window()->maximize();
         return new WebDriverDecorator($driver, WebDriverRecorder::getInstance());
+    }
+
+    public function resetAll(): void
+    {
+        foreach ($this->sessions as $session) {
+            $session->reset();
+        }
     }
 }

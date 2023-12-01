@@ -30,7 +30,7 @@ class WebDriverDecorator extends RemoteWebDriver
         return parent::executeAsyncScript($script, $arguments);
     }
 
-    public function close()
+    public function close(): static
     {
         $this->recorder->record();
         return parent::close();
@@ -42,19 +42,20 @@ class WebDriverDecorator extends RemoteWebDriver
         return parent::get($url);
     }
 
-    public function getCurrentURL()
+    public function getCurrentURL(): string
     {
         $this->recorder->record();
-        return parent::getCurrentURL();
+        // Returns the actual URL when inside an IFrame.
+        return $this->executeScript('return window.location.href;');
     }
 
-    public function getPageSource()
+    public function getPageSource(): string
     {
         $this->recorder->record();
         return parent::getPageSource();
     }
 
-    public function getTitle()
+    public function getTitle(): string
     {
         $this->recorder->record();
         return parent::getTitle();

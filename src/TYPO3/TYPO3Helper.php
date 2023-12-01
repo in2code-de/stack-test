@@ -6,10 +6,17 @@ namespace CoStack\StackTest\TYPO3;
 
 use Closure;
 use CoStack\StackTest\Session\Session;
+use CoStack\StackTest\Test\Constraint\Visibility\ElementIsNotVisible;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsVisible;
+use CoStack\StackTest\Test\Constraint\Visibility\ElementIsVisibleInElement;
+use CoStack\StackTest\Test\Expectation\ElementPositionDoesNotChange;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
+
+use function array_pop;
+use function is_string;
 
 class TYPO3Helper
 {
@@ -25,7 +32,7 @@ class TYPO3Helper
         $session->waitUntil(TYPO3ExpectedCondition::contentIFrameIsLoaded());
     }
 
-    public static function waitUntilPageTreeIsLoaded(Session|RemoteWebDriver $session): void
+    public static function waitUntilNavigationComponentIsLoaded(Session|RemoteWebDriver $session): void
     {
         $session = Session::elevate($session);
         $session->waitUntil(TYPO3ExpectedCondition::pageTreeIsLoaded());
@@ -60,11 +67,14 @@ class TYPO3Helper
         self::waitUntilContentIFrameIsLoaded($session);
     }
 
-    public static function selectInPageTree(Session $session, array $pagePath): void
-    {
+    public static function selectInPageTree(
+        Session $session,
+        array $pagePath,
+        Closure $afterSelectionCallback = null,
+    ): void {
         self::selectModuleByText($session, 'Page');
-        self::waitUntilPageTreeIsLoaded($session);
-        $session->inEachBrowser(static function (Session $session) use ($pagePath): void {
+        self::waitUntilNavigationComponentIsLoaded($session);
+        $session->inEachBrowser(static function (Session $session) use ($pagePath, $afterSelectionCallback): void {
             $pageTreeContainer = $session->findElement(WebDriverBy::cssSelector('#typo3-pagetree-treeContainer'));
 
             // Fail if nodes are not visible
@@ -82,13 +92,54 @@ class TYPO3Helper
                     // Expand the page tree if required
                     $chevronElement = $pageTreeElement->findElement(WebDriverBy::cssSelector('.chevron.collapsed'));
                     $chevronElement->click();
-                    self::waitUntilPageTreeIsLoaded($session);
+                    self::waitUntilNavigationComponentIsLoaded($session);
                 } catch (NoSuchElementException) {
                 }
             }
             $constraint->evaluate(WebDriverBy::xpath("//*[text()='$pageToSelect']"));
             $pageElement = $pageTreeElement->findElement(WebDriverBy::xpath("//*[text()='$pageToSelect']/.."));
             $pageElement->findElement(WebDriverBy::cssSelector('text.node-name'))->click();
+            if (null !== $afterSelectionCallback) {
+                $afterSelectionCallback($session, $folderElement);
+            }
+        });
+        self::waitUntilContentIFrameIsLoaded($session);
+    }
+
+    public static function selectInFileStorageTree(
+        Session $session,
+        array $folderPath,
+        Closure $afterSelectionCallback = null,
+    ): void {
+        self::waitUntilNavigationComponentIsLoaded($session);
+        $session->inEachBrowser(static function (Session $session) use ($folderPath, $afterSelectionCallback): void {
+            $fileStorageTree = $session->findElement(WebDriverBy::id('typo3-filestoragetree-tree'));
+
+            // Fail if nodes are not visible
+            $constraint = new ElementIsVisible($session);
+            $constraint->evaluate(WebDriverBy::cssSelector('g.nodes > .node'));
+
+            $folderToSelect = array_pop($folderPath);
+            $folderTreeElement = $fileStorageTree;
+            foreach ($folderPath as $path) {
+                $constraint->evaluate(WebDriverBy::xpath("//*[text()='$path']/.."));
+
+                $folderTreeElement = $folderTreeElement->findElement(WebDriverBy::xpath("//*[text()='$path']/.."));
+
+                try {
+                    // Expand the page tree if required
+                    $chevronElement = $folderTreeElement->findElement(WebDriverBy::cssSelector('.chevron.collapsed'));
+                    $chevronElement->click();
+                    self::waitUntilNavigationComponentIsLoaded($session);
+                } catch (NoSuchElementException) {
+                }
+            }
+            $constraint->evaluate(WebDriverBy::xpath("//*[text()='$folderToSelect']/.."));
+            $folderElement = $folderTreeElement->findElement(WebDriverBy::xpath("//*[text()='$folderToSelect']/.."));
+            $folderElement->findElement(WebDriverBy::cssSelector('text.node-name'))->click();
+            if (null !== $afterSelectionCallback) {
+                $afterSelectionCallback($session, $folderElement);
+            }
         });
         self::waitUntilContentIFrameIsLoaded($session);
     }
@@ -109,6 +160,33 @@ class TYPO3Helper
     public static function refreshPageTree(Session|RemoteWebDriver $session): void
     {
         $session->executeScript('top.document.dispatchEvent(new CustomEvent("typo3:pagetree:refresh"));');
-        self::waitUntilPageTreeIsLoaded($session);
+        self::waitUntilNavigationComponentIsLoaded($session);
+    }
+
+    public static function refreshFileStorageTree(Session|RemoteWebDriver $session): void
+    {
+        $session->executeScript('top.document.dispatchEvent(new CustomEvent("typo3:filestoragetree:refresh"));');
+        self::waitUntilNavigationComponentIsLoaded($session);
+    }
+
+    /**
+     * Must not be called in IFrame Context!
+     */
+    public static function clickModalButton(
+        Session|RemoteWebDriver $session,
+        string|WebDriverBy $buttonTextOrSelector,
+    ): void {
+        $session = Session::elevate($session);
+        if (is_string($buttonTextOrSelector)) {
+            $buttonTextOrSelector = WebDriverBy::xpath("//button[text()='$buttonTextOrSelector']");
+        }
+        $selector = WebDriverBy::cssSelector('typo3-backend-modal');
+        $session->waitUntil(ElementIsVisible::resolve($selector));
+        $session->waitUntil(ElementIsVisibleInElement::resolve($buttonTextOrSelector, $selector));
+        $session->waitUntil(ElementPositionDoesNotChange::build($selector));
+        $modal = $session->findElement($selector);
+        $button = $modal->findElement($buttonTextOrSelector);
+        $button->click();
+        $session->waitUntil(ElementIsNotVisible::resolve($selector));
     }
 }

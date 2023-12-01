@@ -6,6 +6,7 @@ namespace CoStack\StackTest\Test\Constraint\Existence;
 
 use CoStack\StackTest\Test\Constraint\SessionConstrain;
 use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 
 class ElementExists extends SessionConstrain
@@ -14,7 +15,7 @@ class ElementExists extends SessionConstrain
     {
         try {
             $driver->findElement($other);
-        } catch (NoSuchElementException|UnexpectedResponseException) {
+        } catch (NoSuchElementException|StaleElementReferenceException) {
             return false;
         }
         return true;

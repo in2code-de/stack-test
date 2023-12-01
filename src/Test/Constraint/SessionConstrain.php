@@ -92,8 +92,7 @@ abstract class SessionConstrain extends Constraint
             return $this->driverResults[$browserName];
         }
 
-        foreach ($this->session->drivers as $driver) {
-            $browserName = $driver->getCapabilities()->getBrowserName();
+        foreach ($this->session->drivers as $browserName => $driver) {
             $this->driverResults[$browserName] = $this->driverMatches($other, $driver);
         }
 
