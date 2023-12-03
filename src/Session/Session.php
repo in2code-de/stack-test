@@ -111,6 +111,15 @@ class Session
         $closure($subSession);
     }
 
+    public function inOtherBrowsers(Closure $closure, string $excludedBrowser = null): void
+    {
+        $selectedDrivers = $this->getDriversExcludingBrowser($preferredBrowser);
+        foreach ($selectedDrivers as $selectedDriver) {
+            $subSession = $this->createSubSessionForSingleDriver($selectedDriver);
+            $closure($subSession);
+        }
+    }
+
     public function get(string $url): void
     {
         foreach ($this->drivers as $driver) {
@@ -432,6 +441,19 @@ JS;
             $selectedDriver = $this->drivers[$key];
         }
         return $selectedDriver;
+    }
+
+    /**
+     * @internal You should always use the Session object. Use `createSubSessionForSingleDriver` instead.
+     */
+    public function getDriversExcludingBrowser(?string $excludedBrowser = null): RemoteWebDriver
+    {
+        if (null === $excludedBrowser || !array_key_exists($excludedBrowser, $this->drivers)) {
+            $excludedBrowser = array_key_first($this->drivers);
+        }
+        $drivers = $this->drivers;
+        unset($drivers[$excludedBrowser]);
+        return $drivers;
     }
 
     public function contextClickElement(Element $element): void

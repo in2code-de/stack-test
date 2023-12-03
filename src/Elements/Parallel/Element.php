@@ -9,7 +9,7 @@ use Facebook\WebDriver\WebDriverElement;
 
 class Element
 {
-    /** @param array<string, WebDriverElement> $elementPerDriver */
+    /** @param non-empty-array<string, WebDriverElement> $elementPerDriver */
     public function __construct(public array $elementPerDriver)
     {
     }
@@ -56,7 +56,23 @@ class Element
     {
         $elementPerDriver = [];
         foreach ($this->elementPerDriver as $browserName => $element) {
-            $elementPerDriver[$browserName] = $element->findElement($locator);
+            $webDriverElement = $element->findElement($locator);
+            $elementPerDriver[$browserName] = $webDriverElement;
+        }
+        return new Element($elementPerDriver);
+    }
+
+    public function findFirstVisibleElement(WebDriverBy $locator): Element
+    {
+        $elementPerDriver = [];
+        foreach ($this->elementPerDriver as $browserName => $element) {
+            $webDriverElements = $element->findElements($locator);
+            foreach ($webDriverElements as $webDriverElement) {
+                if ($webDriverElement->isDisplayed()) {
+                    $elementPerDriver[$browserName] = $webDriverElement;
+                    break;
+                }
+            }
         }
         return new Element($elementPerDriver);
     }
@@ -64,11 +80,21 @@ class Element
     public function findElements(WebDriverBy $locator): Elements
     {
         $elementsPerDriver = [];
-        foreach ($this->elementPerDriver as $browserName => $elements) {
-            foreach ($elements as $element) {
-                $elementsPerDriver[$browserName] = $element->findElements($locator);
-            }
+        foreach ($this->elementPerDriver as $browserName => $element) {
+            $elementsPerDriver[$browserName] = $element->findElements($locator);
         }
         return new Elements($elementsPerDriver);
+    }
+
+    public function isSelected(): bool
+    {
+        foreach ($this->elementPerDriver as $browserName => $element) {
+            if (!isset($value)) {
+                $value = $element->isSelected();
+            } elseif ($value !== $element->isSelected()) {
+                throw new \Exception('Got different values for isSelected');
+            }
+        }
+        return $value;
     }
 }

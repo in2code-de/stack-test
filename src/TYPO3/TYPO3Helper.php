@@ -10,9 +10,9 @@ use CoStack\StackTest\Test\Constraint\Visibility\ElementIsNotVisible;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsVisible;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsVisibleInElement;
 use CoStack\StackTest\Test\Expectation\ElementPositionDoesNotChange;
+use Exception;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
-use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
 
 use function array_pop;
@@ -36,6 +36,20 @@ class TYPO3Helper
     {
         $session = Session::elevate($session);
         $session->waitUntil(TYPO3ExpectedCondition::pageTreeIsLoaded());
+    }
+
+    public static function waitUntilModalIsOpen(Session|RemoteWebDriver $session): void
+    {
+        $selector = WebDriverBy::cssSelector('typo3-backend-modal');
+        $session->waitUntil(ElementIsVisible::resolve($selector));
+        $session->waitUntil(ElementPositionDoesNotChange::build($selector));
+    }
+
+    public static function waitUntilModalIsClosed(Session|RemoteWebDriver $session): void
+    {
+        $selector = WebDriverBy::cssSelector('typo3-backend-modal');
+        $session->waitUntil(ElementIsNotVisible::resolve($selector));
+        $session->waitUntil(ElementPositionDoesNotChange::build($selector));
     }
 
     public static function backendLogin(Session $session, string $url, string $username, string $password): void
@@ -100,7 +114,7 @@ class TYPO3Helper
             $pageElement = $pageTreeElement->findElement(WebDriverBy::xpath("//*[text()='$pageToSelect']/.."));
             $pageElement->findElement(WebDriverBy::cssSelector('text.node-name'))->click();
             if (null !== $afterSelectionCallback) {
-                $afterSelectionCallback($session, $folderElement);
+                $afterSelectionCallback($session, $pageElement);
             }
         });
         self::waitUntilContentIFrameIsLoaded($session);
@@ -177,16 +191,16 @@ class TYPO3Helper
         string|WebDriverBy $buttonTextOrSelector,
     ): void {
         $session = Session::elevate($session);
+        if ($session->isInIFrameContext()) {
+            throw new Exception(__METHOD__ . ' must not be called in IFrame context');
+        }
         if (is_string($buttonTextOrSelector)) {
             $buttonTextOrSelector = WebDriverBy::xpath("//button[text()='$buttonTextOrSelector']");
         }
-        $selector = WebDriverBy::cssSelector('typo3-backend-modal');
-        $session->waitUntil(ElementIsVisible::resolve($selector));
-        $session->waitUntil(ElementIsVisibleInElement::resolve($buttonTextOrSelector, $selector));
-        $session->waitUntil(ElementPositionDoesNotChange::build($selector));
-        $modal = $session->findElement($selector);
+        self::waitUntilModalIsOpen($session);
+        $modal = $session->findElement(WebDriverBy::cssSelector('typo3-backend-modal'));
         $button = $modal->findElement($buttonTextOrSelector);
         $button->click();
-        $session->waitUntil(ElementIsNotVisible::resolve($selector));
+        self::waitUntilModalIsClosed($session);
     }
 }
