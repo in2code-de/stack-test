@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\Form;
 
-use CoStack\StackTest\Test\Constraint\SessionWithSelectorConstraint;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
+use CoStack\StackTest\Test\Constraint\DriverWithSelectorConstraint;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Facebook\WebDriver\WebDriverSelectInterface;
 
-abstract class SelectableFormConstraint extends SessionWithSelectorConstraint
+abstract class SelectableFormConstraint extends DriverWithSelectorConstraint
 {
-    abstract protected function getWebDriverObject(RemoteWebDriver $driver): WebDriverSelectInterface;
+    abstract protected function getWebDriverObject(WebDriver $driver): WebDriverSelectInterface;
 
-    protected function getSelectedOptionTexts(RemoteWebDriver $driver): array
+    protected function getSelectedOptionTexts(WebDriver $driver): array
     {
         $texts = [];
         $selectedOptions = $this->getWebDriverObject($driver)->getAllSelectedOptions();
@@ -22,7 +22,7 @@ abstract class SelectableFormConstraint extends SessionWithSelectorConstraint
         return $texts;
     }
 
-    protected function getSelectedOptionValues(RemoteWebDriver $driver): array
+    protected function getSelectedOptionValues(WebDriver $driver): array
     {
         $texts = [];
         $selectedOptions = $this->getWebDriverObject($driver)->getAllSelectedOptions();

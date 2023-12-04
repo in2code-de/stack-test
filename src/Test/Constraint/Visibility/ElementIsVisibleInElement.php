@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\Visibility;
 
-use CoStack\StackTest\Test\Constraint\SessionWithSelectorConstraint;
+use CoStack\StackTest\Test\Constraint\DriverWithSelectorConstraint;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\StaleElementReferenceException;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
 
-class ElementIsVisibleInElement extends SessionWithSelectorConstraint
+class ElementIsVisibleInElement extends DriverWithSelectorConstraint
 {
-    protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
+    protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
         try {
             $element = $driver->findElement($this->selector);
@@ -23,7 +23,7 @@ class ElementIsVisibleInElement extends SessionWithSelectorConstraint
         }
     }
 
-    protected function descriptionForDriver(RemoteWebDriver $driver, bool $exportObjects = false): string
+    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
     {
         return sprintf(
             'is visible on page %s in browser %s',

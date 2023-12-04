@@ -4,44 +4,47 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Tests\Acceptance;
 
-use CoStack\StackTest\BrowserTestCase;
-use CoStack\StackTest\Factory\SessionFactory;
+use CoStack\StackTest\Test\Assert\DriverAssertions;
+use CoStack\StackTest\WebDriver\Factory;
 use Facebook\WebDriver\WebDriverBy;
+use PHPUnit\Framework\TestCase;
 
-class PageTest extends BrowserTestCase
+class PageTest extends TestCase
 {
+    use DriverAssertions;
+
     public function testPageTitle(): void
     {
-        $session = SessionFactory::getInstance()->create('session1');
-        $session->get('https://web.local.co-stack-test.com/form.php');
+        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver->get('https://web.local.co-stack-test.com/form.php');
 
-        self::assertPageTitleEquals($session, 'Testing Form for test-stack');
-        self::assertPageTitleContains($session, 'Form for test-stack');
-        self::assertPageTitleNotEquals($session, 'Testing Form for phpunit');
-        self::assertPageTitleNotContains($session, 'fooo');
+        self::assertPageTitleEquals($driver, 'Testing Form for test-stack');
+        self::assertPageTitleContains($driver, 'Form for test-stack');
+        self::assertPageTitleNotEquals($driver, 'Testing Form for phpunit');
+        self::assertPageTitleNotContains($driver, 'fooo');
     }
 
     public function testPageHistoryNavigation(): void
     {
-        $session = SessionFactory::getInstance()->create('session1');
-        $session->get('https://web.local.co-stack-test.com/test.php');
+        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver->get('https://web.local.co-stack-test.com/test.php');
 
-        self::assertCurrentUrlEquals($session, 'https://web.local.co-stack-test.com/test.php');
+        self::assertCurrentUrlEquals($driver, 'https://web.local.co-stack-test.com/test.php');
 
-        $session->click(WebDriverBy::linkText('test2'));
+        $driver->findElement(WebDriverBy::linkText('test2'))->click();
 
-        self::assertCurrentUrlEquals($session, 'https://web.local.co-stack-test.com/test2.php');
+        self::assertCurrentUrlEquals($driver, 'https://web.local.co-stack-test.com/test2.php');
 
-        $session->refresh();
+        $driver->navigate()->refresh();
 
-        self::assertCurrentUrlEquals($session, 'https://web.local.co-stack-test.com/test2.php');
+        self::assertCurrentUrlEquals($driver, 'https://web.local.co-stack-test.com/test2.php');
 
-        $session->back();
+        $driver->navigate()->back();
 
-        self::assertCurrentUrlEquals($session, 'https://web.local.co-stack-test.com/test.php');
+        self::assertCurrentUrlEquals($driver, 'https://web.local.co-stack-test.com/test.php');
 
-        $session->forward();
+        $driver->navigate()->forward();
 
-        self::assertCurrentUrlEquals($session, 'https://web.local.co-stack-test.com/test2.php');
+        self::assertCurrentUrlEquals($driver, 'https://web.local.co-stack-test.com/test2.php');
     }
 }

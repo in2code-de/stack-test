@@ -4,58 +4,48 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Tests\Acceptance;
 
-use CoStack\StackTest\BrowserTestCase;
-use CoStack\StackTest\Factory\SessionFactory;
-use CoStack\StackTest\Session\Session;
+use CoStack\StackTest\Test\Assert\DriverAssertions;
+use CoStack\StackTest\WebDriver\Factory;
 use Facebook\WebDriver\Cookie;
+use PHPUnit\Framework\TestCase;
 
-class CookieTest extends BrowserTestCase
+class CookieTest extends TestCase
 {
-    protected Session $session;
-
-    protected function setUp(): void
-    {
-        $this->session = SessionFactory::getInstance()->create('session1');
-    }
-
-    protected function tearDown(): void
-    {
-        $this->session->reset();
-    }
+    use DriverAssertions;
 
     public function testCookieCanBeSetAndUnset(): void
     {
-        $session = SessionFactory::getInstance()->create('session1');
-        $session->get('https://web.local.co-stack-test.com/test.php');
+        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver->get('https://web.local.co-stack-test.com/test.php');
 
-        self::assertPageContains($session, 'hi there');
+        self::assertPageContains($driver, 'hi there');
 
         $cookie = new Cookie('coke', 'matsch');
         $cookie->setSecure(true);
-        $session->setCookie($cookie);
+        $driver->manage()->addCookie($cookie);
 
-        self::assertCookieIsEqual($session, $cookie);
+        self::assertCookieIsEqual($driver, $cookie);
 
-        $session->deleteCookie($cookie);
+        $driver->manage()->deleteCookieNamed($cookie->getName());
 
-        self::assertCookieIsNotSet($session, $cookie);
+        self::assertCookieIsNotSet($driver, $cookie);
     }
 
     public function testCookieIsRemovedBySessionReset(): void
     {
-        $session = SessionFactory::getInstance()->create('session1');
-        $session->get('https://web.local.co-stack-test.com/test.php');
+        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver->get('https://web.local.co-stack-test.com/test.php');
 
-        self::assertPageContains($session, 'hi there');
+        self::assertPageContains($driver, 'hi there');
 
         $cookie = new Cookie('coke', 'matsch');
         $cookie->setSecure(true);
-        $session->setCookie($cookie);
+        $driver->manage()->addCookie($cookie);
 
-        self::assertCookieIsEqual($session, $cookie);
+        self::assertCookieIsEqual($driver, $cookie);
 
-        $session->reset();
+        $driver->reset();
 
-        self::assertCookieIsNotSet($session, $cookie);
+        self::assertCookieIsNotSet($driver, $cookie);
     }
 }

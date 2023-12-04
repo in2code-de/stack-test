@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\Form\Input\Check;
 
-use CoStack\StackTest\Test\Constraint\SessionConstrain;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
+use CoStack\StackTest\Test\Constraint\DriverConstrain;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 
-class CheckboxIsChecked extends SessionConstrain
+class CheckboxIsChecked extends DriverConstrain
 {
-    protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
+    protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
         $element = $driver->findElement($other);
         return 'true' === $element->getAttribute('checked');
     }
 
-    protected function descriptionForDriver(RemoteWebDriver $driver, bool $exportObjects = false): string
+    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
     {
         $browserName = $driver->getCapabilities()->getBrowserName();
 

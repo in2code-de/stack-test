@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace CoStack\StackTest\Test\Constraint\Form;
 
 use CoStack\StackTest\Elements\Single\Form;
-use CoStack\StackTest\Test\Constraint\SessionWithSelectorConstraint;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
+use CoStack\StackTest\Test\Constraint\DriverWithSelectorConstraint;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Util\Exporter;
 use SebastianBergmann\Comparator\ComparisonFailure;
 
-class FormDataEquals extends SessionWithSelectorConstraint
+class FormDataEquals extends DriverWithSelectorConstraint
 {
-    protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
+    protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
         $formData = $this->getFormData($driver);
         try {
@@ -25,16 +25,15 @@ class FormDataEquals extends SessionWithSelectorConstraint
         return true;
     }
 
-    protected function descriptionForDriver(RemoteWebDriver $driver, bool $exportObjects = false): string
+    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
     {
         $formData = $this->getFormData($driver);
         return sprintf('matches actual form data %s', Exporter::export($formData, $exportObjects));
     }
 
-    protected function getFormData(RemoteWebDriver $driver): array
+    protected function getFormData(WebDriver $driver): array
     {
-        $formElement = $driver->findElement($this->selector);
-        $form = new Form($formElement);
+        $form = new Form($driver, $this->selector);
         return $form->getData();
     }
 
@@ -47,7 +46,7 @@ class FormDataEquals extends SessionWithSelectorConstraint
                 throw $exception;
             }
             $diff = null;
-            foreach ($this->session->drivers as $browserName => $driver) {
+            foreach ($this->driver->drivers as $browserName => $driver) {
                 if ($this->driverResults[$browserName]) {
                     continue;
                 }

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace CoStack\StackTest\Test\Expectation;
 
 use Closure;
-use CoStack\StackTest\Session\Session;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
+use CoStack\StackTest\WebDriver\Remote\MultiWebDriver;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
 
 use function in_array;
@@ -15,28 +15,24 @@ class ElementPositionDoesNotChange
 {
     public static function build(WebDriverBy $locator): Closure
     {
-        $finishedAnimations = [];
-        $previousCoordinates = [];
-        return static function (Session|RemoteWebDriver $session) use (
-            &$previousCoordinates,
-            &$finishedAnimations,
-            $locator,
-        ): bool {
-            $session = Session::elevate($session);
-            foreach ($session->drivers as $browserName => $driver) {
-                $finishedAnimations[$browserName] ??= false;
-                if ($finishedAnimations[$browserName]) {
+        $finished = [];
+        $previous = [];
+        return static function (WebDriver $driver) use (&$previous, &$finished, $locator): bool {
+            $drivers = $driver instanceof MultiWebDriver ? $driver->drivers : [$driver];
+            foreach ($drivers as $singleDriver) {
+                $finished[$singleDriver->browserName] ??= false;
+                if ($finished[$singleDriver->browserName]) {
                     continue;
                 }
-                $element = $driver->findElement($locator);
+                $element = $singleDriver->findElement($locator);
                 $elementCoordinates = $element->getCoordinates()->onPage();
-                $previousElementPosition = $previousCoordinates[$browserName] ?? null;
+                $previousElementPosition = $previous[$singleDriver->browserName] ?? null;
                 if (null !== $previousElementPosition && $elementCoordinates->equals($previousElementPosition)) {
-                    $finishedAnimations[$browserName] = true;
+                    $finished[$singleDriver->browserName] = true;
                 }
-                $previousCoordinates[$browserName] = $elementCoordinates;
+                $previous[$singleDriver->browserName] = $elementCoordinates;
             }
-            return !in_array(false, $finishedAnimations, true);
+            return !in_array(false, $finished, true);
         };
     }
 }

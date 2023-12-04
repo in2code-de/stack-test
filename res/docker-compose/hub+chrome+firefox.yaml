@@ -27,6 +27,7 @@ services:
       SE_VNC_NO_PASSWORD: 1
     ports:
       - ${SELENIUM_NODE_CHROME_VNC_PORT:-14320}:5900
+      - ${SELENIUM_NODE_CHROME_NOVNC_PORT:-14330}:5900
 
   selenium-node-firefox:
     image: ${SELENIUM_NODE_CHROME_IMAGE:-selenium/node-firefox}
@@ -40,3 +41,4 @@ services:
       SE_VNC_NO_PASSWORD: 1
     ports:
       - ${SELENIUM_NODE_FIREFOX_VNC_PORT:-14321}:5900
+      - ${SELENIUM_NODE_FIREFOX_NOVNC_PORT:-14331}:7900

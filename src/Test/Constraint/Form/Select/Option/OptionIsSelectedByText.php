@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\Form\Select\Option;
 
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Exception;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
+
+use function CoStack\StackTest\resolve;
 
 class OptionIsSelectedByText extends SelectedOptionConstraint
 {
-    protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
+    protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
-        $other = $this->resolveSelectorsInOtherToText($driver, $other);
+        $other = resolve($driver, $other);
         if (!is_string($other)) {
             throw new Exception(
                 'Value to compare the selected option\'s text to must be string but is ' . get_debug_type($other),

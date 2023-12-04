@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\Cookie;
 
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Exception;
 use Facebook\WebDriver\Cookie;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Comparator\Factory as ComparatorFactory;
 
@@ -14,7 +14,7 @@ class CookieIsSame extends CookieIsEqual
 {
     protected ?array $setCookie = null;
 
-    protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
+    protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
         if (!$other instanceof Cookie) {
             throw new Exception('Cookie must be instance of \Facebook\WebDriver\Cookie');

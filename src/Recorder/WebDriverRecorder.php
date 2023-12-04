@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Recorder;
 
-use CoStack\StackTest\Decorator\WebDriverDecorator;
 use CoStack\StackTest\Pattern\Singleton;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use WeakReference;
 
@@ -19,19 +19,19 @@ class WebDriverRecorder
 
     public function record(): void
     {
-        $frame = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2)[1];
+        $frame = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 4)[3];
 
-        /** @var WebDriverDecorator $decorator */
-        $decorator = $frame['object'];
+        /** @var WebDriver $driver */
+        $driver = $frame['object'];
 
-        $driver = WeakReference::create($decorator->inner);
+        $driver = WeakReference::create($driver);
         $this->calls[] = [
             'driver' => $driver,
             'func' => $frame['function'],
             'args' => $frame['args'],
         ];
         if ($frame['function'] === 'get') {
-            $this->history[spl_object_hash($decorator->inner)][] = $frame['args'][0];
+            $this->history[spl_object_hash($driver)][] = $frame['args'][0];
         }
         $toRemove = count($this->calls) - self::LIMIT;
         reset($this->calls);
@@ -48,7 +48,7 @@ class WebDriverRecorder
         return $this->calls;
     }
 
-    public function getHistory(RemoteWebDriver $driver): array
+    public function getHistory(WebDriver $driver): array
     {
         return $this->history[spl_object_hash($driver)] ?? [];
     }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CoStack\StackTest\Subscriber;
 
 use CoStack\StackTest\Recorder\WebDriverRecorder;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use PHPUnit\Event\Code\TestMethod;
 use PHPUnit\Event\Test\Failed;
 use PHPUnit\Event\Test\FailedSubscriber;
@@ -13,6 +13,8 @@ use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 use WeakReference;
+
+use function CoStack\Lib\mkdir_deep;
 
 abstract class AbstractFailedSubscriber implements FailedSubscriber
 {
@@ -60,45 +62,36 @@ abstract class AbstractFailedSubscriber implements FailedSubscriber
             $fileName = getcwd() . '/' . $fileName;
         }
 
-        $this->ensureDirectoryExists($fileName);
+        mkdir_deep($fileName);
         $fileContents = $this->getFileContents($driver);
         file_put_contents($fileName, $fileContents);
 
         $this->printNotification($fileName, $event);
     }
 
-    protected function getLastUsedDriverFromHistory(): ?RemoteWebDriver
+    protected function getLastUsedDriverFromHistory(): ?WebDriver
     {
         $history = $this->recorder->getCalls();
         if (empty($history)) {
             return null;
         }
-        $driver = null;
         end($history);
         while (key($history)) {
             $frame = current($history);
             /** @var WeakReference $driverReference */
             $driverReference = $frame['driver'];
             $driver = $driverReference->get();
-            if ($driver instanceof RemoteWebDriver) {
-                break;
+            if ($driver instanceof WebDriver) {
+                return $driver;
             }
             prev($history);
         }
-        return $driver;
+        return null;
     }
 
-    abstract protected function getFileContents(RemoteWebDriver $driver): string;
+    abstract protected function getFileContents(WebDriver $driver): string;
 
     protected function printNotification(string $fileName, Failed $event): void
     {
-    }
-
-    public function ensureDirectoryExists(string $fileName): void
-    {
-        $directory = dirname($fileName);
-        if (!is_dir($directory) && !mkdir($directory, 0775, true) && !is_dir($directory)) {
-            throw new RuntimeException(sprintf('Directory "%s" was not created', $directory));
-        }
     }
 }

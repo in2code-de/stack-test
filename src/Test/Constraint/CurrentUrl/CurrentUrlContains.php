@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\CurrentUrl;
 
-use CoStack\StackTest\Test\Constraint\SessionConstrain;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
+use CoStack\StackTest\Test\Constraint\DriverConstrain;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 
-class CurrentUrlContains extends SessionConstrain
+class CurrentUrlContains extends DriverConstrain
 {
-    protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
+    protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
         $currentUrl = $driver->getCurrentURL();
         return str_contains($currentUrl, $other);
     }
 
-    protected function descriptionForDriver(RemoteWebDriver $driver, bool $exportObjects = false): string
+    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
     {
         $browserName = $driver->getCapabilities()->getBrowserName();
 

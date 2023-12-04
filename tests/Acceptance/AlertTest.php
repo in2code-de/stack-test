@@ -4,81 +4,77 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Tests\Acceptance;
 
-use CoStack\StackTest\BrowserTestCase;
-use CoStack\StackTest\Factory\SessionFactory;
-use CoStack\StackTest\Session\Session;
-use Facebook\WebDriver\WebDriverAlert;
+use CoStack\StackTest\Test\Assert\DriverAssertions;
+use CoStack\StackTest\WebDriver\Factory;
 use Facebook\WebDriver\WebDriverBy;
+use PHPUnit\Framework\TestCase;
 
-class AlertTest extends BrowserTestCase
+class AlertTest extends TestCase
 {
+    use DriverAssertions;
+
     public function testAlertPopupTextCanBeTested(): void
     {
-        $session = SessionFactory::getInstance()->create('session1');
-        $session->get('https://web.local.co-stack-test.com/alert.php');
+        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver->get('https://web.local.co-stack-test.com/alert.php');
 
-        $session->inPopupContext(function (Session $session, WebDriverAlert $alert): void {
-            $text = $alert->getText();
-            self::assertSame('Test alert Message', $text);
-            $alert->accept();
-        });
+        $alert = $driver->switchTo()->alert();
+        $text = $alert->getText();
+        self::assertSame('Test alert Message', $text);
+        $alert->accept();
     }
 
     public function testConfirmPopupCanBeAccepted(): void
     {
-        $session = SessionFactory::getInstance()->create('session1');
-        $session->get('https://web.local.co-stack-test.com/confirm.php');
+        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver->get('https://web.local.co-stack-test.com/confirm.php');
 
-        $session->inPopupContext(function (Session $session, WebDriverAlert $alert): void {
-            $text = $alert->getText();
-            self::assertSame('Test confirm Message', $text);
-            $alert->accept();
-        });
+        $alert = $driver->switchTo()->alert();
+        $text = $alert->getText();
+        self::assertSame('Test confirm Message', $text);
+        $alert->accept();
 
-        self::assertElementEquals($session, 'Confirmed', WebDriverBy::id('confirmation'));
+        self::assertElementEquals($driver, 'Confirmed', WebDriverBy::id('confirmation'));
     }
 
     public function testConfirmPopupCanBeDismissed(): void
     {
-        $session = SessionFactory::getInstance()->create('session1');
-        $session->get('https://web.local.co-stack-test.com/confirm.php');
+        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver->get('https://web.local.co-stack-test.com/confirm.php');
 
-        $session->inPopupContext(function (Session $session, WebDriverAlert $alert): void {
-            $text = $alert->getText();
-            self::assertSame('Test confirm Message', $text);
-            $alert->dismiss();
-        });
+        $alert = $driver->switchTo()->alert();
+        $text = $alert->getText();
+        self::assertSame('Test confirm Message', $text);
+        $alert->dismiss();
 
-        self::assertElementEquals($session, 'Declined', WebDriverBy::id('confirmation'));
+        self::assertElementEquals($driver, 'Declined', WebDriverBy::id('confirmation'));
     }
 
     public function testPromptPopupCanBeFilled(): void
     {
-        $session = SessionFactory::getInstance()->create('session1');
-        $session->get('https://web.local.co-stack-test.com/prompt.php');
+        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver->get('https://web.local.co-stack-test.com/prompt.php');
 
-        $session->inPopupContext(function (Session $session, WebDriverAlert $alert): void {
-            $text = $alert->getText();
-            self::assertSame('Enter your test message', $text);
-            $alert->sendKeys('My test string 1');
-            $alert->accept();
-        });
+        $alert = $driver->switchTo()->alert();
+        $text = $alert->getText();
+        self::assertSame('Enter your test message', $text);
+        $alert->sendKeys('My test string 1');
+        $alert->accept();
 
-        self::assertElementEquals($session, 'My test string 1', WebDriverBy::id('prompt-result'));
+        self::assertElementEquals($driver, 'My test string 1', WebDriverBy::id('prompt-result'));
     }
 
     public function testPromptPopupCanBeCancelled(): void
     {
-        $session = SessionFactory::getInstance()->create('session1');
-        $session->get('https://web.local.co-stack-test.com/prompt.php');
+        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver->get('https://web.local.co-stack-test.com/prompt.php');
 
-        $session->inPopupContext(function (Session $session, WebDriverAlert $alert): void {
-            $text = $alert->getText();
-            self::assertSame('Enter your test message', $text);
-            $alert->sendKeys('My test string 1');
-            $alert->dismiss();
-        });
+        $alert = $driver->switchTo()->alert();
+        $text = $alert->getText();
+        self::assertSame('Enter your test message', $text);
+        $alert->sendKeys('My test string 1');
+        $alert->dismiss();
 
-        self::assertElementEquals($session, '', WebDriverBy::id('prompt-result'));
+        self::assertElementEquals($driver, '', WebDriverBy::id('prompt-result'));
     }
 }

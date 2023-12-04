@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace CoStack\StackTest\Test\Constraint\Form\Select\Option;
 
 use CoStack\StackTest\Test\Constraint\Form\SelectableFormConstraint;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Facebook\WebDriver\Exception\UnexpectedTagNameException;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverSelect;
 use PHPUnit\Util\Exporter;
 
@@ -15,13 +15,13 @@ abstract class SelectedOptionConstraint extends SelectableFormConstraint
     /**
      * @throws UnexpectedTagNameException
      */
-    protected function getWebDriverObject(RemoteWebDriver $driver): WebDriverSelect
+    protected function getWebDriverObject(WebDriver $driver): WebDriverSelect
     {
         $element = $driver->findElement($this->selector);
         return new WebDriverSelect($element);
     }
 
-    protected function descriptionForDriver(RemoteWebDriver $driver, bool $exportObjects = false): string
+    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
     {
         $browserName = $driver->getCapabilities()->getBrowserName();
 

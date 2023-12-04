@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\Cookie;
 
-use CoStack\StackTest\Test\Constraint\SessionConstrain;
+use CoStack\StackTest\Test\Constraint\DriverConstrain;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\Exception\NoSuchCookieException;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
 
-class CookieIsNotSet extends SessionConstrain
+class CookieIsNotSet extends DriverConstrain
 {
-    protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
+    protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
         if ($other instanceof Cookie) {
             $other = $other->getName();
@@ -24,7 +24,7 @@ class CookieIsNotSet extends SessionConstrain
         return false;
     }
 
-    protected function descriptionForDriver(RemoteWebDriver $driver, bool $exportObjects = false): string
+    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
     {
         return sprintf(
             'is not set on page %s in browser %s',

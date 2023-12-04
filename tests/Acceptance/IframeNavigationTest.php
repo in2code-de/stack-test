@@ -4,32 +4,35 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Tests\Acceptance;
 
-use CoStack\StackTest\BrowserTestCase;
-use CoStack\StackTest\Factory\SessionFactory;
-use CoStack\StackTest\Session\Session;
+use CoStack\StackTest\Test\Assert\DriverAssertions;
+use CoStack\StackTest\WebDriver\Factory;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
+use PHPUnit\Framework\TestCase;
 
-class IframeNavigationTest extends BrowserTestCase
+class IframeNavigationTest extends TestCase
 {
+    use DriverAssertions;
+
     public function testSwitchToIframeAndBack(): void
     {
-        $session = SessionFactory::getInstance()->create('session1');
-        $session->get('https://web.local.co-stack-test.com/iframe.php');
+        $diver = Factory::getInstance()->createMultiDriver('session1');
+        $diver->get('https://web.local.co-stack-test.com/iframe.php');
 
-        self::assertPageContains($session, 'Main frame');
-        self::assertPageNotContains($session, 'Eye frame');
-        self::assertCurrentUrlEquals($session, 'https://web.local.co-stack-test.com/iframe.php');
+        self::assertPageContains($diver, 'Main frame');
+        self::assertPageNotContains($diver, 'Eye frame');
+        self::assertCurrentUrlEquals($diver, 'https://web.local.co-stack-test.com/iframe.php');
 
-        $session->inIFrameContext(WebDriverBy::id('content-iframe'), function (Session $session): void {
-            self::assertPageContains($session, 'Eye frame');
-            self::assertPageNotContains($session, 'Main Frame');
-            self::assertPageNotContains($session, 'Eye frame two');
-            $session->click(WebDriverBy::linkText('content 2'));
-            self::assertPageContains($session, 'Eye frame two');
+        $diver->inIFrameContext(WebDriverBy::id('content-iframe'), function (WebDriver $driver): void {
+            self::assertPageContains($driver, 'Eye frame');
+            self::assertPageNotContains($driver, 'Main Frame');
+            self::assertPageNotContains($driver, 'Eye frame two');
+            $driver->findElement(WebDriverBy::linkText('content 2'))->click();
+            self::assertPageContains($driver, 'Eye frame two');
         });
 
-        self::assertPageContains($session, 'Main frame');
-        self::assertPageNotContains($session, 'Eye frame');
-        self::assertPageNotContains($session, 'Eye frame two');
+        self::assertPageContains($diver, 'Main frame');
+        self::assertPageNotContains($diver, 'Eye frame');
+        self::assertPageNotContains($diver, 'Eye frame two');
     }
 }

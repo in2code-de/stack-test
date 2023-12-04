@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\Form\Input\Check;
 
-use Facebook\WebDriver\Remote\RemoteWebDriver;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverCheckboxes;
 
 class CheckboxesAreNotChecked extends SelectedCheckboxesConstraint
 {
-    protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
+    protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
         $other = $this->resolveSelectorsInOtherToValue($driver, $other);
         if (is_string($other)) {
@@ -21,14 +21,14 @@ class CheckboxesAreNotChecked extends SelectedCheckboxesConstraint
     }
 
     /** @return array<RemoteWebElement> */
-    protected function getCheckedCheckboxes(RemoteWebDriver $driver): array
+    protected function getCheckedCheckboxes(WebDriver $driver): array
     {
         $element = $driver->findElement($this->selector);
         $checkboxes = new WebDriverCheckboxes($element);
         return $checkboxes->getAllSelectedOptions();
     }
 
-    protected function getCheckedValues(RemoteWebDriver $driver): array
+    protected function getCheckedValues(WebDriver $driver): array
     {
         $values = [];
         foreach ($this->getCheckedCheckboxes($driver) as $checkbox) {
@@ -37,7 +37,7 @@ class CheckboxesAreNotChecked extends SelectedCheckboxesConstraint
         return $values;
     }
 
-    protected function descriptionForDriver(RemoteWebDriver $driver, bool $exportObjects = false): string
+    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
     {
         $browserName = $driver->getCapabilities()->getBrowserName();
 

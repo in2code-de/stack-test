@@ -5,18 +5,17 @@ declare(strict_types=1);
 namespace CoStack\StackTest\Test\Constraint;
 
 use Closure;
-use CoStack\StackTest\Session\Session;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Exception;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 
-abstract class SessionWithSelectorConstraint extends SessionConstrain
+abstract class DriverWithSelectorConstraint extends DriverConstrain
 {
     public function __construct(
-        RemoteWebDriver|Session $session,
+        WebDriver $driver,
         protected readonly WebDriverBy $selector,
     ) {
-        parent::__construct($session);
+        parent::__construct($driver);
     }
 
     public static function resolve(mixed $other, WebDriverBy $selector = null): Closure
@@ -24,8 +23,8 @@ abstract class SessionWithSelectorConstraint extends SessionConstrain
         if (null === $selector) {
             throw new Exception('$selector must not be null');
         }
-        return static function (Session|RemoteWebDriver $session) use ($other, $selector): bool {
-            $constraint = new static($session, $selector);
+        return static function (WebDriver $driver) use ($other, $selector): bool {
+            $constraint = new static($driver, $selector);
             $result = $constraint->eval($other);
             return $result;
         };

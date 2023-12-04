@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\Cookie;
 
-use CoStack\StackTest\Test\Constraint\SessionConstrain;
+use CoStack\StackTest\Test\Constraint\DriverConstrain;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Exception;
 use Facebook\WebDriver\Cookie;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
 use PHPUnit\Util\Exporter;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Comparator\Factory as ComparatorFactory;
 
-class CookieIsEqual extends SessionConstrain
+class CookieIsEqual extends DriverConstrain
 {
     protected ?array $setCookie = null;
 
-    protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
+    protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
         if (!$other instanceof Cookie) {
             throw new Exception('Cookie must be instance of \Facebook\WebDriver\Cookie');
@@ -47,7 +47,7 @@ class CookieIsEqual extends SessionConstrain
         return false;
     }
 
-    protected function descriptionForDriver(RemoteWebDriver $driver, bool $exportObjects = false): string
+    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
     {
         $browserName = $driver->getCapabilities()->getBrowserName();
         $lastVisitedUrl = $driver->getCurrentURL();

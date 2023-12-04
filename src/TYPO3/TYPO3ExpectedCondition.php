@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace CoStack\StackTest\TYPO3;
 
 use Closure;
-use CoStack\StackTest\Session\Session;
 use CoStack\StackTest\Test\Constraint\Existence\ElementExists;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsNotVisible;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsVisible;
@@ -17,7 +16,7 @@ class TYPO3ExpectedCondition extends WebDriverExpectedCondition
 {
     public static function contentIFrameIsLoaded(): Closure
     {
-        return static function (Session|RemoteWebDriver $driver): bool {
+        return static function (RemoteWebDriver $driver): bool {
             return ElementIsVisible::resolve(WebDriverBy::id('typo3-contentIframe'))($driver)
                 && ElementIsNotVisible::resolve(WebDriverBy::id('nprogress'))($driver);
         };
@@ -29,7 +28,7 @@ class TYPO3ExpectedCondition extends WebDriverExpectedCondition
         $svgTreeLoaderExists = ElementExists::resolve($selector);
         $svgTreeLoaderIsNotVisible = ElementIsNotVisible::resolve($selector);
 
-        return static function (Session|RemoteWebDriver $session) use ($svgTreeLoaderExists, $svgTreeLoaderIsNotVisible): bool {
+        return static function (RemoteWebDriver $session) use ($svgTreeLoaderExists, $svgTreeLoaderIsNotVisible): bool {
             return $svgTreeLoaderExists($session)
                 && $svgTreeLoaderIsNotVisible($session);
         };

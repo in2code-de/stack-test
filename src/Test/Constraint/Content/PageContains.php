@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\Content;
 
-use CoStack\StackTest\Test\Constraint\SessionConstrain;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
+use CoStack\StackTest\Test\Constraint\DriverConstrain;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
 
-class PageContains extends SessionConstrain
+class PageContains extends DriverConstrain
 {
-    protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
+    protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
         $selector = WebDriverBy::cssSelector('body');
         $remoteWebElement = $driver->findElement($selector);
@@ -18,7 +18,7 @@ class PageContains extends SessionConstrain
         return str_contains($text, $other);
     }
 
-    protected function descriptionForDriver(RemoteWebDriver $driver, bool $exportObjects = false): string
+    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
     {
         return sprintf(
             'is displayed on page %s in %s',

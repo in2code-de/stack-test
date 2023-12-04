@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\Form\Input\Radio;
 
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Exception;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
 
 class RadioIsNotSelected extends SelectedRadiosConstraint
 {
-    protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
+    protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
         $other = $this->resolveSelectorsInOtherToValue($driver, $other);
         if (!is_string($other) && null !== $other) {
@@ -28,17 +28,15 @@ class RadioIsNotSelected extends SelectedRadiosConstraint
         return $other !== $selectedValues;
     }
 
-    protected function descriptionForDriver(RemoteWebDriver $driver, bool $exportObjects = false): string
+    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
     {
-        $browserName = $driver->getCapabilities()->getBrowserName();
-
         $selectedValue = $this->getSelectedValue($driver);
 
         return sprintf(
             'does not match selected radio %s on page %s in browser %s',
             $selectedValue,
             $driver->getCurrentURL(),
-            $browserName,
+            $driver->browserName,
         );
     }
 }

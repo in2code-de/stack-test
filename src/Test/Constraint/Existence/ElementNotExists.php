@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\Existence;
 
-use CoStack\StackTest\Test\Constraint\SessionConstrain;
-use Facebook\WebDriver\Exception\Internal\UnexpectedResponseException;
+use CoStack\StackTest\Test\Constraint\DriverConstrain;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\StaleElementReferenceException;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
 
-class ElementNotExists extends SessionConstrain
+class ElementNotExists extends DriverConstrain
 {
-    protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
+    protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
         try {
             $driver->findElement($other);
@@ -22,7 +21,7 @@ class ElementNotExists extends SessionConstrain
         return false;
     }
 
-    protected function descriptionForDriver(RemoteWebDriver $driver, bool $exportObjects = false): string
+    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
     {
         return sprintf(
             'not exists on page %s in %s',

@@ -4,41 +4,45 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Tests\Acceptance;
 
-use CoStack\StackTest\BrowserTestCase;
-use CoStack\StackTest\Factory\SessionFactory;
+use CoStack\StackTest\Test\Assert\DriverAssertions;
+use CoStack\StackTest\WebDriver\Factory;
 use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverSelect;
+use PHPUnit\Framework\TestCase;
 
-class InitialBrowserTest extends BrowserTestCase
+class InitialBrowserTest extends TestCase
 {
+    use DriverAssertions;
+
     public function testOpeningUrl(): void
     {
-        $session = SessionFactory::getInstance()->create('session1');
-        $session->get('https://web.local.co-stack-test.com/test.php');
+        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver->get('https://web.local.co-stack-test.com/test.php');
 
-        self::assertPageContains($session, 'hi there');
+        self::assertPageContains($driver, 'hi there');
 
         $cookie = new Cookie('coke', 'matsch');
         $cookie->setSecure(true);
-        $session->setCookie($cookie);
+        $driver->manage()->addCookie($cookie);
 
-        self::assertCookieIsEqual($session, $cookie);
+        self::assertCookieIsEqual($driver, $cookie);
 
-        self::assertPageNotContains($session, 'hella');
+        self::assertPageNotContains($driver, 'hella');
 
-        self::assertElementContains($session, 'hi there', WebDriverBy::cssSelector('body'));
-        self::assertElementNotContains($session, 'hella', WebDriverBy::cssSelector('body'));
-        self::assertElementExists($session, WebDriverBy::cssSelector('body'));
-        self::assertElementNotExists($session, WebDriverBy::cssSelector('custom-element'));
+        self::assertElementContains($driver, 'hi there', WebDriverBy::cssSelector('body'));
+        self::assertElementNotContains($driver, 'hella', WebDriverBy::cssSelector('body'));
+        self::assertElementExists($driver, WebDriverBy::cssSelector('body'));
+        self::assertElementNotExists($driver, WebDriverBy::cssSelector('custom-element'));
 
-        $session->click(WebDriverBy::linkText('test2'));
+        $driver->findElement(WebDriverBy::linkText('test2'))->click();
 
-        self::assertPageContains($session, 'PHP Version 8.1');
-        self::assertCurrentUrlContains($session, 'est2');
-        self::assertCurrentUrlNotContains($session, 'test.php');
+        self::assertPageContains($driver, 'PHP Version 8.1');
+        self::assertCurrentUrlContains($driver, 'est2');
+        self::assertCurrentUrlNotContains($driver, 'test.php');
 
-        self::assertCheckboxIsChecked($session, WebDriverBy::name('fuuu'));
-        self::assertCheckboxIsNotChecked($session, WebDriverBy::name('faaa'));
+        self::assertCheckboxIsChecked($driver, WebDriverBy::name('fuuu'));
+        self::assertCheckboxIsNotChecked($driver, WebDriverBy::name('faaa'));
 
         //// Show element IDs for each browser
         //$elements = $session->findElements(WebDriverBy::name('fuuu'));
@@ -52,24 +56,27 @@ class InitialBrowserTest extends BrowserTestCase
 
         $fieldSelector = WebDriverBy::name('huahsd');
 
-        self::assertFieldContains($session, 'blabla', $fieldSelector);
-        self::assertFieldNotContains($session, 'igigigi', $fieldSelector);
+        self::assertFieldContains($driver, 'blabla', $fieldSelector);
+        self::assertFieldNotContains($driver, 'igigigi', $fieldSelector);
 
-        $session->fillField($fieldSelector, 'igigigi');
-        self::assertFieldContains($session, 'igigigi', $fieldSelector);
+        $driver->fillField($fieldSelector, 'igigigi');
+        self::assertFieldContains($driver, 'igigigi', $fieldSelector);
 
-        $session->clearField($fieldSelector);
-        self::assertFieldNotContains($session, 'igigigi', $fieldSelector);
+        $driver->clearField($fieldSelector);
+        self::assertFieldNotContains($driver, 'igigigi', $fieldSelector);
 
         $selectSelector = WebDriverBy::name('kfsljd');
 
-        self::assertOptionIsSelectedByText($session, 'Bar', $selectSelector);
-        self::assertOptionIsSelectedByValue($session, '1', $selectSelector);
+        self::assertOptionIsSelectedByText($driver, 'Bar', $selectSelector);
+        self::assertOptionIsSelectedByValue($driver, '1', $selectSelector);
 
-        $session->selectOption($selectSelector, 'Foo');
+        foreach ($driver->drivers as $remoteWebDriver) {
+            $select = new WebDriverSelect($remoteWebDriver->findElement($selectSelector));
+            $select->selectByVisibleText('Foo');
+        }
 
-        self::assertOptionIsSelectedByText($session, 'Foo', $selectSelector);
-        self::assertOptionIsSelectedByValue($session, '', $selectSelector);
+        self::assertOptionIsSelectedByText($driver, 'Foo', $selectSelector);
+        self::assertOptionIsSelectedByValue($driver, '', $selectSelector);
 
         //$session->checkOption()
         //$session->type()

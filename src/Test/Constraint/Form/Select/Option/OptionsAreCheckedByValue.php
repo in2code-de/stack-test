@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\Form\Select\Option;
 
-use Facebook\WebDriver\Remote\RemoteWebDriver;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 
 class OptionsAreCheckedByValue extends SelectedOptionConstraint
 {
-    protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
+    protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
         $other = $this->resolveSelectorsInOtherToValue($driver, $other);
 

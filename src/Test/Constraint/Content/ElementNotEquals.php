@@ -4,25 +4,27 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\Content;
 
-use CoStack\StackTest\Test\Constraint\SessionWithSelectorConstraint;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
+use CoStack\StackTest\Test\Constraint\DriverWithSelectorConstraint;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use PHPUnit\Util\Exporter;
 
-class ElementNotEquals extends SessionWithSelectorConstraint
+use function CoStack\StackTest\resolveElementText;
+
+class ElementNotEquals extends DriverWithSelectorConstraint
 {
-    protected function driverMatches(mixed $other, RemoteWebDriver $driver): bool
+    protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
         $element = $driver->findElement($this->selector);
-        $value = $this->resolveElementText($element);
+        $value = resolveElementText($element);
         return $value !== $other;
     }
 
-    protected function descriptionForDriver(RemoteWebDriver $driver, bool $exportObjects = false): string
+    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
     {
         $browserName = $driver->getCapabilities()->getBrowserName();
 
         $element = $driver->findElement($this->selector);
-        $value = $this->resolveElementText($element);
+        $value = resolveElementText($element);
 
         return sprintf(
             'is not the same as value "%s" of element %s on page %s in browser %s',
