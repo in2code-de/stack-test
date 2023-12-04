@@ -14,6 +14,9 @@ class ElementIsVisibleInElement extends DriverWithSelectorConstraint
     protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
         $elements = $driver->findElements($this->selector);
+        if (empty($elements)) {
+            return false;
+        }
         foreach ($elements as $element) {
             try {
                 $childElement = $element->findElement($other);

@@ -12,6 +12,9 @@ class ElementIsVisible extends DriverConstrain
     protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
         $elements = $driver->findElements($other);
+        if (empty($elements)) {
+            return false;
+        }
         foreach ($elements as $element) {
             try {
                 if (!$element->isDisplayed()) {
