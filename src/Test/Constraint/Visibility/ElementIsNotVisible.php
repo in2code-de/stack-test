@@ -13,13 +13,16 @@ class ElementIsNotVisible extends DriverConstrain
 {
     protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
-        try {
-            $element = $driver->findElement($other);
-            $result = !$element->isDisplayed();
-            return $result;
-        } catch (NoSuchElementException|StaleElementReferenceException) {
-            return true;
+        $elements = $driver->findElements($other);
+        foreach ($elements as $element) {
+            try {
+                if ($element->isDisplayed()) {
+                    return false;
+                }
+            } catch (NoSuchElementException|StaleElementReferenceException) {
+            }
         }
+        return true;
     }
 
     protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string

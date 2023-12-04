@@ -6,20 +6,21 @@ namespace CoStack\StackTest\Test\Constraint\Visibility;
 
 use CoStack\StackTest\Test\Constraint\DriverConstrain;
 use CoStack\StackTest\WebDriver\Remote\WebDriver;
-use Facebook\WebDriver\Exception\NoSuchElementException;
-use Facebook\WebDriver\Exception\StaleElementReferenceException;
 
 class ElementIsVisible extends DriverConstrain
 {
     protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
-        try {
-            $element = $driver->findElement($other);
-            $result = $element->isDisplayed();
-            return $result;
-        } catch (NoSuchElementException|StaleElementReferenceException) {
-            return false;
+        $elements = $driver->findElements($other);
+        foreach ($elements as $element) {
+            try {
+                if (!$element->isDisplayed()) {
+                    return false;
+                }
+            } catch (NoSuchElementException|StaleElementReferenceException) {
+            }
         }
+        return true;
     }
 
     protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string

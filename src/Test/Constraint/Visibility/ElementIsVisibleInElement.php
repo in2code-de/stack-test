@@ -13,14 +13,17 @@ class ElementIsVisibleInElement extends DriverWithSelectorConstraint
 {
     protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
-        try {
-            $element = $driver->findElement($this->selector);
-            $childElement = $element->findElement($other);
-            $result = $childElement->isDisplayed();
-            return $result;
-        } catch (NoSuchElementException|StaleElementReferenceException) {
-            return false;
+        $elements = $driver->findElements($this->selector);
+        foreach ($elements as $element) {
+            try {
+                $childElement = $element->findElement($other);
+                if ($childElement->isDisplayed()) {
+                    return true;
+                }
+            } catch (NoSuchElementException|StaleElementReferenceException) {
+            }
         }
+        return false;
     }
 
     protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string

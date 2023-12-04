@@ -7,7 +7,6 @@ namespace CoStack\StackTest\Test\Expectation;
 use Closure;
 use CoStack\StackTest\WebDriver\Remote\MultiWebDriver;
 use CoStack\StackTest\WebDriver\Remote\WebDriver;
-use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\WebDriverBy;
 
 use function in_array;
@@ -25,18 +24,21 @@ class ElementPositionDoesNotChange
                 if ($finished[$singleDriver->browserName]) {
                     continue;
                 }
-                try {
-                    $element = $singleDriver->findElement($locator);
-                } catch (NoSuchElementException) {
+
+                $elements = $singleDriver->findElements($locator);
+                if (empty($elements)) {
                     $finished[$singleDriver->browserName] = true;
                     continue;
                 }
-                $elementCoordinates = $element->getCoordinates()->onPage();
-                $previousElementPosition = $previous[$singleDriver->browserName] ?? null;
-                if (null !== $previousElementPosition && $elementCoordinates->equals($previousElementPosition)) {
-                    $finished[$singleDriver->browserName] = true;
+                foreach ($elements as $element) {
+                    $elementId = $element->getID();
+                    $elementCoordinates = $element->getCoordinates()->onPage();
+                    $previousElementPosition = $previous[$singleDriver->browserName][$elementId] ?? null;
+                    if (null !== $previousElementPosition && $elementCoordinates->equals($previousElementPosition)) {
+                        $finished[$singleDriver->browserName] = true;
+                    }
+                    $previous[$singleDriver->browserName][$elementId] = $elementCoordinates;
                 }
-                $previous[$singleDriver->browserName] = $elementCoordinates;
             }
             return !in_array(false, $finished, true);
         };
