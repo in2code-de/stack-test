@@ -15,6 +15,7 @@ use PHPUnit\TextUI\Configuration\Configuration;
 use WeakReference;
 
 use function CoStack\Lib\mkdir_deep;
+use function dirname;
 
 abstract class AbstractFailedSubscriber implements FailedSubscriber
 {
@@ -62,7 +63,7 @@ abstract class AbstractFailedSubscriber implements FailedSubscriber
             $fileName = getcwd() . '/' . $fileName;
         }
 
-        mkdir_deep($fileName);
+        mkdir_deep(dirname($fileName));
         $fileContents = $this->getFileContents($driver);
         file_put_contents($fileName, $fileContents);
 
