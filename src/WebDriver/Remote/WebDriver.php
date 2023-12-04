@@ -33,6 +33,7 @@ class WebDriver extends RemoteWebDriver
         WebDriverCapabilities $capabilities,
         $isW3cCompliant = false,
     ) {
+        register_shutdown_function(fn() => $this->quit());
         parent::__construct(new RecordingCommandExecutor($commandExecutor), $sessionId, $capabilities, $isW3cCompliant);
         $this->browserName = $this->capabilities->getBrowserName();
         $this->manage()->window()->maximize();

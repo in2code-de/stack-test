@@ -7,6 +7,7 @@ namespace CoStack\StackTest\Test\Expectation;
 use Closure;
 use CoStack\StackTest\WebDriver\Remote\MultiWebDriver;
 use CoStack\StackTest\WebDriver\Remote\WebDriver;
+use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\WebDriverBy;
 
 use function in_array;
@@ -24,7 +25,12 @@ class ElementPositionDoesNotChange
                 if ($finished[$singleDriver->browserName]) {
                     continue;
                 }
-                $element = $singleDriver->findElement($locator);
+                try {
+                    $element = $singleDriver->findElement($locator);
+                } catch (NoSuchElementException) {
+                    $finished[$singleDriver->browserName] = true;
+                    continue;
+                }
                 $elementCoordinates = $element->getCoordinates()->onPage();
                 $previousElementPosition = $previous[$singleDriver->browserName] ?? null;
                 if (null !== $previousElementPosition && $elementCoordinates->equals($previousElementPosition)) {
