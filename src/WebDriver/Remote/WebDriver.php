@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\WebDriver\Remote;
 
+use Closure;
 use CoStack\StackTest\Elements\Single\Form;
 use CoStack\StackTest\Exception\HiddenInputCanNotBeFilledException;
 use CoStack\StackTest\Routines\Reset\ChromeReset;
@@ -12,9 +13,15 @@ use Exception;
 use Facebook\WebDriver\Exception\ElementNotInteractableException;
 use Facebook\WebDriver\Remote\HttpCommandExecutor;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\Remote\WebDriverBrowserType;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverCapabilities;
+
+use Facebook\WebDriver\WebDriverElement;
+
+use function CoStack\StackTest\resolve;
+use function is_string;
 
 class WebDriver extends RemoteWebDriver
 {
@@ -39,6 +46,12 @@ class WebDriver extends RemoteWebDriver
             default => throw new Exception('Reset routine not implemented for ' . $this->browserName),
         };
         $routine->execute($this);
+    }
+
+    public function submit(WebDriverBy $by): static
+    {
+        $this->findElement($by)->submit();
+        return $this;
     }
 
     public function submitForm(WebDriverBy $by, array $data = []): void
@@ -77,6 +90,40 @@ class WebDriver extends RemoteWebDriver
     {
         $this->findElement($by)->clear();
         return $this;
+    }
+
+    public function click(WebDriverBy|string $by): static
+    {
+        if (is_string($by)) {
+            $by = WebDriverBy::linkText($by);
+        }
+        $element = $this->findElement($by);
+        $element->click();
+        return $this;
+    }
+
+    public function contextClick(WebDriverBy|RemoteWebElement $element): static
+    {
+        if ($element instanceof WebDriverBy) {
+            $element = $this->findElement($element);
+        }
+        $action = $this->action();
+        $action->contextClick($element);
+        $action->perform();
+        return $this;
+    }
+
+    public function inIFrameContext(WebDriverBy|WebDriverElement|null|int|string $frame, Closure $callback): void
+    {
+        try {
+            if ($frame instanceof WebDriverBy) {
+                $frame = $this->findElement($frame);
+            }
+            $this->switchTo()->frame($frame);
+            $callback($this);
+        } finally {
+            $this->switchTo()->defaultContent();
+        }
     }
 
     public function isInIFrameContext(): bool

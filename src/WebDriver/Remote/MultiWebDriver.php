@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CoStack\StackTest\WebDriver\Remote;
 
 use Closure;
+use CoStack\StackTest\Test\Constraint\Visibility\ElementIsNotVisible;
 use Exception;
 use Facebook\WebDriver\Interactions\WebDriverActions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
@@ -12,11 +13,19 @@ use Facebook\WebDriver\Remote\HttpCommandExecutor;
 use Facebook\WebDriver\Remote\RemoteKeyboard;
 use Facebook\WebDriver\Remote\RemoteMouse;
 use Facebook\WebDriver\Remote\RemoteTouchScreen;
+use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\Remote\WebDriverResponse;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverCommandExecutor;
 use Facebook\WebDriver\WebDriverElement;
 use Facebook\WebDriver\WebDriverWait;
+
+use function array_values;
+use function count;
+use function current;
+use function func_get_args;
+use function next;
+use function reset;
 
 class MultiWebDriver extends WebDriver
 {
@@ -58,6 +67,14 @@ class MultiWebDriver extends WebDriver
         }
     }
 
+    public function submit(WebDriverBy $by): static
+    {
+        foreach ($this->drivers as $driver) {
+            $driver->submit($by);
+        }
+        return $this;
+    }
+
     public function submitForm(WebDriverBy $by, array $data = []): void
     {
         foreach ($this->drivers as $driver) {
@@ -88,6 +105,33 @@ class MultiWebDriver extends WebDriver
         return $this;
     }
 
+    public function click(WebDriverBy|string $by): static
+    {
+        foreach ($this->drivers as $driver) {
+            $driver->click($by);
+        }
+        return $this;
+    }
+
+    public function contextClick(WebDriverBy|RemoteWebElement $by): static
+    {
+        if ($by instanceof MultiRemoteWebElement) {
+            $elements = array_values($by->elements);
+            $drivers = array_values($this->drivers);
+            if (count($elements) !== count($drivers)) {
+                throw new Exception('Mismatch of elements and drivers');
+            }
+            foreach ($elements as $index => $element) {
+                $drivers[$index]->contextClick($element);
+            }
+            return $this;
+        }
+        foreach ($this->drivers as $driver) {
+            $driver->contextClick($by);
+        }
+        return $this;
+    }
+
     public function isInIFrameContext(): bool
     {
         return $this->getReturnValue(__FUNCTION__);
@@ -107,6 +151,11 @@ class MultiWebDriver extends WebDriver
         return $this->drivers[$firstKey];
     }
 
+    public function inFirstDriver(Closure $callback): mixed
+    {
+        return $callback($this->getFirstDriver());
+    }
+
     /** @return array<WebDriver> */
     public function getDriversExceptFirst(): array
     {
@@ -116,19 +165,10 @@ class MultiWebDriver extends WebDriver
         return $drivers;
     }
 
-    public function inIFrameContext(WebDriverBy|WebDriverElement|null|int|string $frame, Closure $closure): void
+    public function inIFrameContext(WebDriverBy|WebDriverElement|null|int|string $frame, Closure $callback): void
     {
         foreach ($this->drivers as $driver) {
-            $resolvedFrame = $frame;
-            if ($resolvedFrame instanceof WebDriverBy) {
-                $resolvedFrame = $driver->findElement($resolvedFrame);
-            }
-            try {
-                $driver->switchTo()->frame($resolvedFrame);
-                $closure($driver);
-            } finally {
-                $driver->switchTo()->defaultContent();
-            }
+            $driver->inIFrameContext($frame, $callback);
         }
     }
 
@@ -378,6 +418,7 @@ class MultiWebDriver extends WebDriver
         next($drivers);
         $values = [];
         while ($driver = current($drivers)) {
+            next($drivers);
             $pageSource = $driver->{$method}(...$arguments);
             if ($pageSource !== $initial) {
                 $values[$driver->browserName] = $pageSource;

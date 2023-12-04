@@ -22,7 +22,7 @@ class Factory
         string $seleniumUrl = 'http://selenium-hub:4444',
     ): MultiWebDriver {
         $sessionId ??= bin2hex(random_bytes(16));
-        return $this->drivers[$sessionId] ??= new MultiWebDriver($sessionId, [
+        return $this->drivers['multi'][$sessionId] ??= new MultiWebDriver($sessionId, [
             'chrome' => $this->createChromeDriver($sessionId, $seleniumUrl),
             'firefox' => $this->createFirefoxDriver($sessionId, $seleniumUrl),
         ]);
@@ -34,7 +34,11 @@ class Factory
     ): WebDriver {
         $desiredCapabilities = DesiredCapabilities::chrome();
         $desiredCapabilities->setCapability(WebDriverCapabilityType::ACCEPT_SSL_CERTS, true);
-        return $this->drivers[$sessionId] ??= $this->createDriver($desiredCapabilities, $sessionId, $seleniumUrl);
+        return $this->drivers['chrome'][$sessionId] ??= $this->createDriver(
+            $desiredCapabilities,
+            $sessionId,
+            $seleniumUrl,
+        );
     }
 
     public function createFirefoxDriver(
@@ -43,7 +47,11 @@ class Factory
     ): WebDriver {
         $desiredCapabilities = DesiredCapabilities::firefox();
         $desiredCapabilities->setCapability(WebDriverCapabilityType::ACCEPT_SSL_CERTS, true);
-        return $this->drivers[$sessionId] ??= $this->createDriver($desiredCapabilities, $sessionId, $seleniumUrl);
+        return $this->drivers['firefox'][$sessionId] ??= $this->createDriver(
+            $desiredCapabilities,
+            $sessionId,
+            $seleniumUrl,
+        );
     }
 
     public function createDriver(
@@ -51,6 +59,9 @@ class Factory
         string $sessionId = null,
         string $seleniumUrl = 'http://selenium-hub:4444',
     ): WebDriver {
-        return $this->drivers[$sessionId] ??= WebDriver::create($seleniumUrl, $desiredCapabilities);
+        return $this->drivers[$desiredCapabilities->getBrowserName()][$sessionId] ??= WebDriver::create(
+            $seleniumUrl,
+            $desiredCapabilities,
+        );
     }
 }
