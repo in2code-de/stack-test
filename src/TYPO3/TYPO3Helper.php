@@ -8,14 +8,19 @@ use Closure;
 use CoStack\StackTest\Test\Constraint\Source\ElementHasClass;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsNotVisible;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsVisible;
-use CoStack\StackTest\Test\Constraint\Visibility\ElementIsVisibleInElement;
 use CoStack\StackTest\Test\Expectation\ElementPositionDoesNotChange;
 use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Exception;
+use Facebook\WebDriver\Exception\ElementNotInteractableException;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\WebDriverBy;
 
+use PHPUnit\Framework\AssertionFailedError;
+
+use function array_key_last;
 use function array_pop;
+use function array_shift;
+use function array_values;
 use function is_string;
 
 class TYPO3Helper
@@ -85,34 +90,36 @@ class TYPO3Helper
         array $pagePath,
         Closure $afterSelectionCallback = null,
     ): void {
-        self::selectModuleByText($driver, 'Page');
+        $pagePath = array_values($pagePath);
         self::waitUntilNavigationComponentIsLoaded($driver);
-        $pageTreeContainer = $driver->findElement(WebDriverBy::cssSelector('#typo3-pagetree-treeContainer'));
 
         // Fail if nodes are not visible
-        $constraint = new ElementIsVisible($driver);
-        $constraint->evaluate(WebDriverBy::cssSelector('g.nodes > .node'));
+        $initialNode = $driver->findElement(
+            WebDriverBy::xpath('//*[@id="typo3-pagetree-treeContainer"]//*[@class="node"]'),
+        );
 
-        $pageToSelect = array_pop($pagePath);
-        $pageTreeElement = $pageTreeContainer;
-        foreach ($pagePath as $path) {
-            $constraint->evaluate(WebDriverBy::xpath("//*[text()='$path']"));
+        $pageTreeElement = $initialNode;
 
-            $pageTreeElement = $pageTreeElement->findElement(WebDriverBy::xpath("//*[text()='$path']/.."));
+        $lastIndex = array_key_last($pagePath);
+        foreach ($pagePath as $index => $page) {
+            $webDriverBy = WebDriverBy::xpath("//following-sibling::*//*[text()='$page']/..");
+            $pageTreeElement = $pageTreeElement->findElement($webDriverBy);
 
-            try {
-                // Expand the page tree if required
-                $chevronElement = $pageTreeElement->findElement(WebDriverBy::cssSelector('.chevron.collapsed'));
-                $chevronElement->click();
-                self::waitUntilNavigationComponentIsLoaded($driver);
-            } catch (NoSuchElementException) {
+            if ($index !== $lastIndex) {
+                try {
+                    // Expand the page tree if required
+                    $chevronElement = $pageTreeElement->findElement(WebDriverBy::cssSelector('.chevron.collapsed'));
+                    if ($chevronElement->isDisplayed()) {
+                        $chevronElement->click();
+                    }
+                    self::waitUntilNavigationComponentIsLoaded($driver);
+                } catch (NoSuchElementException) {
+                }
             }
         }
-        $constraint->evaluate(WebDriverBy::xpath("//*[text()='$pageToSelect']"));
-        $pageElement = $pageTreeElement->findElement(WebDriverBy::xpath("//*[text()='$pageToSelect']/.."));
-        $pageElement->findElement(WebDriverBy::cssSelector('text.node-name'))->click();
+        $pageTreeElement->findElement(WebDriverBy::cssSelector('text.node-name'))->click();
         if (null !== $afterSelectionCallback) {
-            $afterSelectionCallback($driver, $pageElement);
+            $afterSelectionCallback($driver, $pageTreeElement);
         }
         self::waitUntilContentIFrameIsLoaded($driver);
     }
@@ -123,32 +130,29 @@ class TYPO3Helper
         Closure $afterSelectionCallback = null,
     ): void {
         self::waitUntilNavigationComponentIsLoaded($driver);
-        $fileStorageTree = $driver->findElement(WebDriverBy::id('typo3-filestoragetree-tree'));
 
         // Fail if nodes are not visible
-        $constraint = new ElementIsVisible($driver);
-        $constraint->evaluate(WebDriverBy::cssSelector('g.nodes > .node'));
 
-        $folderToSelect = array_pop($folderPath);
-        $folderTreeElement = $fileStorageTree;
+        $storage = array_shift($folderPath);
+        $storageSelector = WebDriverBy::xpath("//*[@id='typo3-filestoragetree-tree']//*[@class='node']//*[text()='$storage']/..");
+        $folderTreeElement = $driver->findElement($storageSelector);
         foreach ($folderPath as $path) {
-            $constraint->evaluate(WebDriverBy::xpath("//*[text()='$path']/.."));
-
-            $folderTreeElement = $folderTreeElement->findElement(WebDriverBy::xpath("//*[text()='$path']/.."));
+            $folderSelector = WebDriverBy::xpath("//following-sibling::*//*[text()='$path']/..");
+            $folderTreeElement = $folderTreeElement->findElement($folderSelector);
 
             try {
                 // Expand the page tree if required
                 $chevronElement = $folderTreeElement->findElement(WebDriverBy::cssSelector('.chevron.collapsed'));
-                $chevronElement->click();
+                if ($chevronElement->isDisplayed()) {
+                    $chevronElement->click();
+                }
                 self::waitUntilNavigationComponentIsLoaded($driver);
             } catch (NoSuchElementException) {
             }
         }
-        $constraint->evaluate(WebDriverBy::xpath("//*[text()='$folderToSelect']/.."));
-        $folderElement = $folderTreeElement->findElement(WebDriverBy::xpath("//*[text()='$folderToSelect']/.."));
-        $folderElement->findElement(WebDriverBy::cssSelector('text.node-name'))->click();
+        $folderTreeElement->findElement(WebDriverBy::cssSelector('text.node-name'))->click();
         if (null !== $afterSelectionCallback) {
-            $afterSelectionCallback($driver, $folderElement);
+            $afterSelectionCallback($driver, $folderTreeElement);
         }
         self::waitUntilContentIFrameIsLoaded($driver);
     }
@@ -187,7 +191,7 @@ class TYPO3Helper
             $buttonTextOrSelector = WebDriverBy::xpath("//button[text()='$buttonTextOrSelector']");
         }
         self::waitUntilModalIsOpen($driver);
-        $modal = $driver->findElement(WebDriverBy::cssSelector('typo3-backend-modal'));
+        $modal = $driver->findElement(WebDriverBy::xpath('//typo3-backend-modal/div[contains(@class, "modal")]'));
         $button = $modal->findElement($buttonTextOrSelector);
         $button->click();
         self::waitUntilModalIsClosed($driver);

@@ -155,98 +155,86 @@ class MultiRemoteWebElement extends RemoteWebElement
         return $firstValue;
     }
 
-    public function getAttribute($attribute_name)
+    public function getAttribute($attribute_name): string|bool|null
     {
-        $arguments = func_get_args();
-        $getter = static fn(RemoteWebElement $element): mixed => $element->{__FUNCTION__}(...$arguments);
+        $getter = static fn(RemoteWebElement $element): string|bool|null => $element->getAttribute($attribute_name);
 
         return $this->getValueIfEqual($getter);
     }
 
-    public function getDomProperty($propertyName)
+    public function getDomProperty($propertyName): mixed
     {
-        $arguments = func_get_args();
-        $getter = static fn(RemoteWebElement $element): mixed => $element->{__FUNCTION__}(...$arguments);
+        $getter = static fn(RemoteWebElement $element): mixed => $element->getDomProperty($propertyName);
 
         return $this->getValueIfEqual($getter);
     }
 
-    public function getCSSValue($css_property_name)
+    public function getCSSValue($css_property_name): string
     {
-        $arguments = func_get_args();
-        $getter = static fn(RemoteWebElement $element): mixed => $element->{__FUNCTION__}(...$arguments);
+        $getter = static fn(RemoteWebElement $element): string => $element->getCSSValue($css_property_name);
 
         return $this->getValueIfEqual($getter);
     }
 
     public function getLocation(): WebDriverPoint
     {
-        $arguments = func_get_args();
-        $getter = static fn(RemoteWebElement $element): mixed => $element->{__FUNCTION__}(...$arguments);
+        $getter = static fn(RemoteWebElement $element): WebDriverPoint => $element->getLocation();
 
         return $this->getPointIfEqual($getter);
     }
 
     public function getLocationOnScreenOnceScrolledIntoView(): WebDriverPoint
     {
-        $arguments = func_get_args();
-        $getter = static fn(RemoteWebElement $element): mixed => $element->{__FUNCTION__}(...$arguments);
+        $getter = static fn(RemoteWebElement $element): WebDriverPoint => $element->getLocationOnScreenOnceScrolledIntoView();
 
         return $this->getPointIfEqual($getter);
     }
 
     public function getCoordinates(): WebDriverCoordinates
     {
-        $arguments = func_get_args();
-        $getter = static fn(RemoteWebElement $element): mixed => $element->{__FUNCTION__}(...$arguments);
+        $getter = static fn(RemoteWebElement $element): WebDriverCoordinates => $element->getCoordinates();
 
         return $this->getCoordinatesIfEqual($getter);
     }
 
-    public function getSize()
+    public function getSize(): WebDriverDimension
     {
-        $arguments = func_get_args();
-        $getter = static fn(RemoteWebElement $element): mixed => $element->{__FUNCTION__}(...$arguments);
+        $getter = static fn(RemoteWebElement $element): WebDriverDimension => $element->getSize();
 
         return $this->getDimensionsIfEqual($getter);
     }
 
     public function getTagName(): string
     {
-        $arguments = func_get_args();
-        $getter = static fn(RemoteWebElement $element): mixed => $element->{__FUNCTION__}(...$arguments);
+        $getter = static fn(RemoteWebElement $element): string => $element->getTagName();
 
         return $this->getValueIfEqual($getter);
     }
 
     public function getText(): string
     {
-        $arguments = func_get_args();
-        $getter = static fn(RemoteWebElement $element): mixed => $element->{__FUNCTION__}(...$arguments);
+        $getter = static fn(RemoteWebElement $element): string => $element->getText();
 
         return $this->getValueIfEqual($getter);
     }
 
     public function isDisplayed(): bool
     {
-        $arguments = func_get_args();
-        $getter = static fn(RemoteWebElement $element): mixed => $element->{__FUNCTION__}(...$arguments);
+        $getter = static fn(RemoteWebElement $element): bool => $element->isDisplayed();
 
         return $this->getValueIfEqual($getter);
     }
 
     public function isEnabled(): bool
     {
-        $arguments = func_get_args();
-        $getter = static fn(RemoteWebElement $element): mixed => $element->{__FUNCTION__}(...$arguments);
+        $getter = static fn(RemoteWebElement $element): bool => $element->isEnabled();
 
         return $this->getValueIfEqual($getter);
     }
 
     public function isSelected(): bool
     {
-        $arguments = func_get_args();
-        $getter = static fn(RemoteWebElement $element): mixed => $element->{__FUNCTION__}(...$arguments);
+        $getter = static fn(RemoteWebElement $element): bool => $element->isSelected();
 
         return $this->getValueIfEqual($getter);
     }

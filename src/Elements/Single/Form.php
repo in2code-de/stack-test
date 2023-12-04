@@ -33,8 +33,9 @@ class Form
 
     public function setData(array $data): void
     {
+        $form = $this->driver->findElement($this->by);
         foreach ($data as $name => $value) {
-            $element = $this->driver->findElement(WebDriverBy::name($name));
+            $element = $form->findElement(WebDriverBy::name($name));
             $formElement = FormElementFactory::fromElement($element);
             $formElement->setValue($value);
         }

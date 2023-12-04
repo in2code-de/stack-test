@@ -11,7 +11,7 @@ class FormElementFactory
     public static function fromElement(RemoteWebElement $element): FormElement
     {
         $tagName = $element->getTagName();
-        $type = $element->getAttribute('type');
+        $type = $element->getAttribute('type') ?? 'text';
         return match ($tagName) {
             'textarea' => new Textarea($element),
             'select' => new Select($element),
