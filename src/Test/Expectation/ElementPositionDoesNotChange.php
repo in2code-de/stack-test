@@ -7,6 +7,7 @@ namespace CoStack\StackTest\Test\Expectation;
 use Closure;
 use CoStack\StackTest\WebDriver\Remote\MultiWebDriver;
 use CoStack\StackTest\WebDriver\Remote\WebDriver;
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
 use Facebook\WebDriver\WebDriverBy;
 
 use function in_array;
@@ -32,7 +33,11 @@ class ElementPositionDoesNotChange
                 }
                 foreach ($elements as $element) {
                     $elementId = $element->getID();
-                    $elementCoordinates = $element->getCoordinates()->onPage();
+                    try {
+                        $elementCoordinates = $element->getCoordinates()->onPage();
+                    } catch (StaleElementReferenceException) {
+                        continue;
+                    }
                     $previousElementPosition = $previous[$singleDriver->browserName][$elementId] ?? null;
                     if (null !== $previousElementPosition && $elementCoordinates->equals($previousElementPosition)) {
                         $finished[$singleDriver->browserName] = true;

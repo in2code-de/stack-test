@@ -64,4 +64,17 @@ class Factory
             $desiredCapabilities,
         );
     }
+
+    public function forgetDriver(WebDriver $driver): void
+    {
+        if ($driver instanceof MultiWebDriver) {
+            unset($this->drivers['multi'][$driver->sessionId]);
+            return;
+        }
+        foreach ($this->drivers[$driver->browserName] as $sessionId => $knownDriver) {
+            if ($knownDriver === $driver) {
+                unset($this->drivers[$driver->browserName][$sessionId]);
+            }
+        }
+    }
 }

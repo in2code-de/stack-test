@@ -9,6 +9,7 @@ use CoStack\StackTest\Elements\Single\Form;
 use CoStack\StackTest\Exception\HiddenInputCanNotBeFilledException;
 use CoStack\StackTest\Routines\Reset\ChromeReset;
 use CoStack\StackTest\Routines\Reset\FirefoxReset;
+use CoStack\StackTest\WebDriver\Factory;
 use Exception;
 use Facebook\WebDriver\Exception\ElementNotInteractableException;
 use Facebook\WebDriver\Remote\HttpCommandExecutor;
@@ -20,7 +21,6 @@ use Facebook\WebDriver\WebDriverCapabilities;
 
 use Facebook\WebDriver\WebDriverElement;
 
-use function CoStack\StackTest\resolve;
 use function is_string;
 
 class WebDriver extends RemoteWebDriver
@@ -47,6 +47,19 @@ class WebDriver extends RemoteWebDriver
             default => throw new Exception('Reset routine not implemented for ' . $this->browserName),
         };
         $routine->execute($this);
+    }
+
+    public function close(): static
+    {
+        // https://developer.mozilla.org/en-US/docs/Web/WebDriver/Errors/InvalidSessionID#implicit_session_deletion
+        Factory::getInstance()->forgetDriver($this);
+        return parent::close();
+    }
+
+    public function quit(): void
+    {
+        Factory::getInstance()->forgetDriver($this);
+        parent::quit();
     }
 
     public function submit(WebDriverBy $by): static

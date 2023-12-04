@@ -6,6 +6,7 @@ namespace CoStack\StackTest\WebDriver\Remote;
 
 use Closure;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsNotVisible;
+use CoStack\StackTest\WebDriver\Factory;
 use Exception;
 use Facebook\WebDriver\Interactions\WebDriverActions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
@@ -139,6 +140,7 @@ class MultiWebDriver extends WebDriver
 
     public function close(): static
     {
+        Factory::getInstance()->forgetDriver($this);
         foreach ($this->drivers as $driver) {
             $driver->close();
         }
@@ -238,6 +240,7 @@ class MultiWebDriver extends WebDriver
 
     public function quit(): void
     {
+        Factory::getInstance()->forgetDriver($this);
         foreach ($this->drivers as $driver) {
             $driver->quit();
         }

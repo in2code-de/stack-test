@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace CoStack\StackTest\TYPO3;
 
 use Closure;
+use CoStack\StackTest\Test\Constraint\Source\ElementHasClass;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsNotVisible;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsVisible;
+use CoStack\StackTest\Test\Constraint\Visibility\ElementIsVisibleInElement;
 use CoStack\StackTest\Test\Expectation\ElementPositionDoesNotChange;
 use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Exception;
@@ -36,14 +38,15 @@ class TYPO3Helper
 
     public static function waitUntilModalIsOpen(WebDriver $driver): void
     {
-        $selector = WebDriverBy::cssSelector('typo3-backend-modal');
+        $selector = WebDriverBy::xpath('//typo3-backend-modal/div[contains(@class, "modal")]');
         $driver->wait()->until(ElementIsVisible::resolve($selector));
         $driver->wait()->until(ElementPositionDoesNotChange::build($selector));
+        $driver->wait()->until(ElementHasClass::resolve('show', $selector));
     }
 
     public static function waitUntilModalIsClosed(WebDriver $driver): void
     {
-        $selector = WebDriverBy::cssSelector('typo3-backend-modal');
+        $selector = WebDriverBy::xpath('//typo3-backend-modal/div[contains(@class, "modal")]');
         $driver->wait()->until(ElementIsNotVisible::resolve($selector));
         $driver->wait()->until(ElementPositionDoesNotChange::build($selector));
     }
