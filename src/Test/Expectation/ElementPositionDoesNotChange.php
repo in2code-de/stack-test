@@ -39,7 +39,12 @@ class ElementPositionDoesNotChange
                         continue;
                     }
                     $previousElementPosition = $previous[$singleDriver->browserName][$elementId] ?? null;
-                    if (null !== $previousElementPosition && $elementCoordinates->equals($previousElementPosition)) {
+                    if (
+                        null !== $previousElementPosition
+                        // Workaround for https://github.com/php-webdriver/php-webdriver/issues/1086
+                        && $elementCoordinates->getX() === $previousElementPosition->getX()
+                        && $elementCoordinates->getY() === $previousElementPosition->getY()
+                    ) {
                         $finished[$singleDriver->browserName] = true;
                     }
                     $previous[$singleDriver->browserName][$elementId] = $elementCoordinates;
