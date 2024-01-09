@@ -12,10 +12,13 @@ use function CoStack\StackTest\resolveElementText;
 
 class ElementContains extends DriverWithSelectorConstraint
 {
+    protected string $resolvedText;
+
     protected function driverMatches(mixed $other, WebDriver $driver): bool
     {
-        $element = $driver->findElement($this->selector);
+        $element = $this->getFirstVisibleElement($driver, $this->selector);
         $value = resolveElementText($element);
+        $this->resolvedText = $value;
         return str_contains($value, $other);
     }
 
@@ -23,12 +26,9 @@ class ElementContains extends DriverWithSelectorConstraint
     {
         $browserName = $driver->getCapabilities()->getBrowserName();
 
-        $element = $driver->findElement($this->selector);
-        $value = resolveElementText($element);
-
         return sprintf(
             'occurs in the text/value "%s" of element %s on page %s in browser %s',
-            $value,
+            $this->resolvedText,
             Exporter::export($this->selector, $exportObjects),
             $driver->getCurrentURL(),
             $browserName,

@@ -12,6 +12,7 @@ namespace CoStack\StackTest\Test\Constraint;
 use Closure;
 use CoStack\StackTest\WebDriver\Remote\MultiWebDriver;
 use CoStack\StackTest\WebDriver\Remote\WebDriver;
+use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
 use PHPUnit\Framework\Constraint\Constraint;
 
@@ -20,6 +21,8 @@ use function debug_backtrace;
 use function implode;
 use function in_array;
 use function is_array;
+
+use function reset;
 
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
 
@@ -105,4 +108,15 @@ abstract class DriverConstrain extends Constraint
     }
 
     abstract protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string;
+
+    protected function getFirstVisibleElement(WebDriver $driver, WebDriverBy $selector): RemoteWebElement
+    {
+        $elements = $driver->findElements($selector);
+        foreach ($elements as $element) {
+            if ($element->isDisplayed()) {
+                return $element;
+            }
+        }
+        return reset($elements);
+    }
 }

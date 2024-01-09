@@ -8,6 +8,9 @@ use Exception;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverSelect;
 
+use function is_array;
+use function is_string;
+
 class Select implements FormElement
 {
     protected WebDriverSelect $select;
@@ -48,5 +51,23 @@ class Select implements FormElement
             throw new Exception('Value to set for form select without multiple must be string');
         }
         $this->select->selectByValue($value);
+    }
+
+    public function setValueByText(array|string $value): void
+    {
+        if ($this->select->isMultiple()) {
+            if (!is_array($value)) {
+                throw new Exception('Value to set for form select with multiple must be array');
+            }
+            $this->select->deselectAll();
+            foreach ($value as $var) {
+                $this->select->selectByVisibleText($var);
+            }
+            return;
+        }
+        if (!is_string($value)) {
+            throw new Exception('Value to set for form select without multiple must be string');
+        }
+        $this->select->selectByVisibleText($value);
     }
 }
