@@ -137,7 +137,7 @@ class TYPO3Helper
         $storageSelector = WebDriverBy::xpath("//*[@id='typo3-filestoragetree-tree']//*[@class='node']//*[text()='$storage']/..");
         $folderTreeElement = $driver->findElement($storageSelector);
         foreach ($folderPath as $path) {
-            $folderSelector = WebDriverBy::xpath("//following-sibling::*//*[text()='$path']/..");
+            $folderSelector = WebDriverBy::xpath("./following-sibling::*//*[text()='$path']/..");
             $folderTreeElement = $folderTreeElement->findElement($folderSelector);
 
             try {
