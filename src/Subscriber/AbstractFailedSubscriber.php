@@ -66,8 +66,6 @@ abstract class AbstractFailedSubscriber implements FailedSubscriber
         mkdir_deep(dirname($fileName));
         $fileContents = $this->getFileContents($driver);
         file_put_contents($fileName, $fileContents);
-
-        $this->printNotification($fileName, $event);
     }
 
     protected function getLastUsedDriverFromHistory(): ?WebDriver
@@ -91,8 +89,4 @@ abstract class AbstractFailedSubscriber implements FailedSubscriber
     }
 
     abstract protected function getFileContents(WebDriver $driver): string;
-
-    protected function printNotification(string $fileName, Failed $event): void
-    {
-    }
 }
