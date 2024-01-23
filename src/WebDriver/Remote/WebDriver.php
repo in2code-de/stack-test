@@ -12,6 +12,7 @@ use CoStack\StackTest\Routines\Reset\FirefoxReset;
 use CoStack\StackTest\WebDriver\Factory;
 use Exception;
 use Facebook\WebDriver\Exception\ElementNotInteractableException;
+use Facebook\WebDriver\Exception\InvalidSessionIdException;
 use Facebook\WebDriver\Remote\HttpCommandExecutor;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\RemoteWebElement;
@@ -58,8 +59,11 @@ class WebDriver extends RemoteWebDriver
 
     public function quit(): void
     {
-        Factory::getInstance()->forgetDriver($this);
-        parent::quit();
+        try {
+            Factory::getInstance()->forgetDriver($this);
+            parent::quit();
+        } catch (InvalidSessionIdException) {
+        }
     }
 
     public function submit(WebDriverBy $by): static
