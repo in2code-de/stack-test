@@ -118,10 +118,10 @@ class TYPO3Helper
             }
         }
         $pageTreeElement->findElement(WebDriverBy::cssSelector('text.node-name'))->click();
+        self::waitUntilContentIFrameIsLoaded($driver);
         if (null !== $afterSelectionCallback) {
             $afterSelectionCallback($driver, $pageTreeElement);
         }
-        self::waitUntilContentIFrameIsLoaded($driver);
     }
 
     public static function selectInFileStorageTree(
