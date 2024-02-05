@@ -6,7 +6,6 @@ namespace CoStack\StackTest\Recorder;
 
 use CoStack\StackTest\Pattern\Singleton;
 use CoStack\StackTest\WebDriver\Remote\WebDriver;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
 use WeakReference;
 
 class WebDriverRecorder
