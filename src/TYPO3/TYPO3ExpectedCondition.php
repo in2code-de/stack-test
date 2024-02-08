@@ -6,6 +6,7 @@ namespace CoStack\StackTest\TYPO3;
 
 use Closure;
 use CoStack\StackTest\Test\Constraint\Existence\ElementExists;
+use CoStack\StackTest\Test\Constraint\Existence\ElementNotExists;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsNotVisible;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsVisible;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
@@ -17,8 +18,8 @@ class TYPO3ExpectedCondition extends WebDriverExpectedCondition
     public static function contentIFrameIsLoaded(): Closure
     {
         return static function (RemoteWebDriver $driver): bool {
-            return ElementIsVisible::resolve(WebDriverBy::id('typo3-contentIframe'))($driver)
-                && ElementIsNotVisible::resolve(WebDriverBy::id('nprogress'))($driver);
+            return ElementIsVisible::resolve(WebDriverBy::cssSelector('#typo3-contentIframe'))($driver)
+                && ElementNotExists::resolve(WebDriverBy::cssSelector('#nprogress'))($driver);
         };
     }
 
