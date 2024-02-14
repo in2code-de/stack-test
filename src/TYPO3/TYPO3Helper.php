@@ -11,14 +11,10 @@ use CoStack\StackTest\Test\Constraint\Visibility\ElementIsVisible;
 use CoStack\StackTest\Test\Expectation\ElementPositionDoesNotChange;
 use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Exception;
-use Facebook\WebDriver\Exception\ElementNotInteractableException;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\WebDriverBy;
 
-use PHPUnit\Framework\AssertionFailedError;
-
 use function array_key_last;
-use function array_pop;
 use function array_shift;
 use function array_values;
 use function is_string;
@@ -69,8 +65,30 @@ class TYPO3Helper
                 'username' => $username,
                 'p_field' => $password,
             ]);
+        } else {
+            // Login form does not exist, so either the backend is broken or we're already logged in
+            $backendToolbarUserMenu = WebDriverBy::cssSelector('.toolbar-item-user .toolbar-item-name');
+            $constrain = new ElementIsVisible($driver);
+            $backendUserIsLoggedIn = $constrain->eval($backendToolbarUserMenu);
+            if (!$backendUserIsLoggedIn) {
+                throw new Exception(
+                    'TYPO3 Backend seems to be broken. No user is logged in and no login form could be found',
+                );
+            }
+            $loggedInUser = $driver->findElement($backendToolbarUserMenu)->getText();
+            if (trim($loggedInUser) !== $username) {
+                self::backendLogout($driver);
+                self::backendLogin($driver, $url, $username, $password);
+            }
         }
         self::waitUntilContentIFrameIsLoaded($driver);
+    }
+
+    public static function backendLogout(WebDriver $driver): void
+    {
+        $toolbarUserMenu = WebDriverBy::cssSelector('.toolbar-item.toolbar-item-user');
+        $driver->click($toolbarUserMenu);
+        $driver->findElement(WebDriverBy::linkText('Logout'))->click();
     }
 
     /**
@@ -134,7 +152,9 @@ class TYPO3Helper
         // Fail if nodes are not visible
 
         $storage = array_shift($folderPath);
-        $storageSelector = WebDriverBy::xpath("//*[@id='typo3-filestoragetree-tree']//*[@class='node']//*[text()='$storage']/..");
+        $storageSelector = WebDriverBy::xpath(
+            "//*[@id='typo3-filestoragetree-tree']//*[@class='node']//*[text()='$storage']/..",
+        );
         $folderTreeElement = $driver->findElement($storageSelector);
         foreach ($folderPath as $path) {
             $folderSelector = WebDriverBy::xpath("./following-sibling::*//*[text()='$path']/..");
