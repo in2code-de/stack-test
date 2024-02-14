@@ -52,9 +52,11 @@ class WebDriver extends RemoteWebDriver
 
     public function close(): static
     {
+        // Closing implicitly quits the session, but has shown to be problematic when repoening the session.
+        // Quitting is more stable than closing.
         // https://developer.mozilla.org/en-US/docs/Web/WebDriver/Errors/InvalidSessionID#implicit_session_deletion
-        Factory::getInstance()->forgetDriver($this);
-        return parent::close();
+        $this->quit();
+        return $this;
     }
 
     public function quit(): void
