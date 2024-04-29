@@ -14,8 +14,11 @@ use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 use WeakReference;
 
+use function CoStack\Lib\concat_paths;
 use function CoStack\Lib\mkdir_deep;
 use function dirname;
+use function getenv;
+use function preg_replace_callback;
 
 abstract class AbstractFailedSubscriber implements FailedSubscriber
 {
@@ -59,8 +62,10 @@ abstract class AbstractFailedSubscriber implements FailedSubscriber
             ],
             $this->fileName,
         );
+        $fileName = preg_replace_callback('/\$([\w_]+)/', static fn(array $env): string => getenv($env[1]), $fileName);
         if (!str_starts_with($fileName, '/')) {
-            $fileName = getcwd() . '/' . $fileName;
+            $basePath = dirname($this->configuration->configurationFile());
+            $fileName = concat_paths($basePath, $fileName);
         }
 
         mkdir_deep(dirname($fileName));
