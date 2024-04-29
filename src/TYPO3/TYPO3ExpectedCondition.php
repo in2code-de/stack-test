@@ -28,10 +28,17 @@ class TYPO3ExpectedCondition extends WebDriverExpectedCondition
         $selector = WebDriverBy::cssSelector('#typo3-pagetree .svg-tree-loader');
         $svgTreeLoaderExists = ElementExists::resolve($selector);
         $svgTreeLoaderIsNotVisible = ElementIsNotVisible::resolve($selector);
+        $pageTreeNode = WebDriverBy::xpath('//*[@id="typo3-pagetree-treeContainer"]//*[@class="node"]');
+        $pageTreeNodeIsVisible = ElementIsVisible::resolve($pageTreeNode);
 
-        return static function (RemoteWebDriver $session) use ($svgTreeLoaderExists, $svgTreeLoaderIsNotVisible): bool {
+        return static function (RemoteWebDriver $session) use (
+            $svgTreeLoaderExists,
+            $svgTreeLoaderIsNotVisible,
+            $pageTreeNodeIsVisible,
+        ): bool {
             return $svgTreeLoaderExists($session)
-                && $svgTreeLoaderIsNotVisible($session);
+                && $svgTreeLoaderIsNotVisible($session)
+                && $pageTreeNodeIsVisible($session);
         };
     }
 
@@ -40,10 +47,17 @@ class TYPO3ExpectedCondition extends WebDriverExpectedCondition
         $selector = WebDriverBy::cssSelector('#typo3-filestoragetree .svg-tree-loader');
         $svgTreeLoaderExists = ElementExists::resolve($selector);
         $svgTreeLoaderIsNotVisible = ElementIsNotVisible::resolve($selector);
+        $folderTreeTreeNode = WebDriverBy::xpath('//*[@id="typo3-pagetree-treeContainer"]//*[@class="node"]');
+        $folderTreeTreeNodeIsVisible = ElementIsVisible::resolve($folderTreeTreeNode);
 
-        return static function (RemoteWebDriver $session) use ($svgTreeLoaderExists, $svgTreeLoaderIsNotVisible): bool {
+        return static function (RemoteWebDriver $session) use (
+            $svgTreeLoaderExists,
+            $svgTreeLoaderIsNotVisible,
+            $folderTreeTreeNodeIsVisible,
+        ): bool {
             return $svgTreeLoaderExists($session)
-                && $svgTreeLoaderIsNotVisible($session);
+                && $svgTreeLoaderIsNotVisible($session)
+                && $folderTreeTreeNodeIsVisible($session);
         };
     }
 }
