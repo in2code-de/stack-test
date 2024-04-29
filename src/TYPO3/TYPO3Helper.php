@@ -39,7 +39,7 @@ class TYPO3Helper
 
     public static function waitUntilFolderTreeIsLoaded(WebDriver $driver): void
     {
-        $driver->wait()->until(TYPO3ExpectedCondition::pageTreeIsLoaded());
+        $driver->wait()->until(TYPO3ExpectedCondition::folderTreeIsLoaded());
     }
 
     public static function waitUntilModalIsOpen(WebDriver $driver): void

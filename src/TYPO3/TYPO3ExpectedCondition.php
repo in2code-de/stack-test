@@ -35,7 +35,7 @@ class TYPO3ExpectedCondition extends WebDriverExpectedCondition
         };
     }
 
-    public static function fileTreeIsLoaded(): Closure
+    public static function folderTreeIsLoaded(): Closure
     {
         $selector = WebDriverBy::cssSelector('#typo3-filestoragetree .svg-tree-loader');
         $svgTreeLoaderExists = ElementExists::resolve($selector);
