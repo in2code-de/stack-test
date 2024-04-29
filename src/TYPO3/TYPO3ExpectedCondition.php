@@ -25,7 +25,19 @@ class TYPO3ExpectedCondition extends WebDriverExpectedCondition
 
     public static function pageTreeIsLoaded(): Closure
     {
-        $selector = WebDriverBy::className('svg-tree-loader');
+        $selector = WebDriverBy::cssSelector('#typo3-pagetree .svg-tree-loader');
+        $svgTreeLoaderExists = ElementExists::resolve($selector);
+        $svgTreeLoaderIsNotVisible = ElementIsNotVisible::resolve($selector);
+
+        return static function (RemoteWebDriver $session) use ($svgTreeLoaderExists, $svgTreeLoaderIsNotVisible): bool {
+            return $svgTreeLoaderExists($session)
+                && $svgTreeLoaderIsNotVisible($session);
+        };
+    }
+
+    public static function fileTreeIsLoaded(): Closure
+    {
+        $selector = WebDriverBy::cssSelector('#typo3-filestoragetree .svg-tree-loader');
         $svgTreeLoaderExists = ElementExists::resolve($selector);
         $svgTreeLoaderIsNotVisible = ElementIsNotVisible::resolve($selector);
 

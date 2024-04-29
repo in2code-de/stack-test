@@ -32,7 +32,12 @@ class TYPO3Helper
         $driver->wait()->until(TYPO3ExpectedCondition::contentIFrameIsLoaded());
     }
 
-    public static function waitUntilNavigationComponentIsLoaded(WebDriver $driver): void
+    public static function waitUntilPageTreeIsLoaded(WebDriver $driver): void
+    {
+        $driver->wait()->until(TYPO3ExpectedCondition::pageTreeIsLoaded());
+    }
+
+    public static function waitUntilFolderTreeIsLoaded(WebDriver $driver): void
     {
         $driver->wait()->until(TYPO3ExpectedCondition::pageTreeIsLoaded());
     }
@@ -109,7 +114,7 @@ class TYPO3Helper
         Closure $afterSelectionCallback = null,
     ): void {
         $pagePath = array_values($pagePath);
-        self::waitUntilNavigationComponentIsLoaded($driver);
+        self::waitUntilPageTreeIsLoaded($driver);
 
         // Fail if nodes are not visible
         $initialNode = $driver->findElement(
@@ -130,7 +135,7 @@ class TYPO3Helper
                     if ($chevronElement->isDisplayed()) {
                         $chevronElement->click();
                     }
-                    self::waitUntilNavigationComponentIsLoaded($driver);
+                    self::waitUntilPageTreeIsLoaded($driver);
                 } catch (NoSuchElementException) {
                 }
             }
@@ -147,7 +152,7 @@ class TYPO3Helper
         array $folderPath,
         Closure $afterSelectionCallback = null,
     ): void {
-        self::waitUntilNavigationComponentIsLoaded($driver);
+        self::waitUntilFolderTreeIsLoaded($driver);
 
         // Fail if nodes are not visible
 
@@ -166,7 +171,7 @@ class TYPO3Helper
                 if ($chevronElement->isDisplayed()) {
                     $chevronElement->click();
                 }
-                self::waitUntilNavigationComponentIsLoaded($driver);
+                self::waitUntilFolderTreeIsLoaded($driver);
             } catch (NoSuchElementException) {
             }
         }
@@ -190,13 +195,13 @@ class TYPO3Helper
     public static function refreshPageTree(WebDriver $driver): void
     {
         $driver->executeScript('top.document.dispatchEvent(new CustomEvent("typo3:pagetree:refresh"));');
-        self::waitUntilNavigationComponentIsLoaded($driver);
+        self::waitUntilPageTreeIsLoaded($driver);
     }
 
     public static function refreshFileStorageTree(WebDriver $driver): void
     {
         $driver->executeScript('top.document.dispatchEvent(new CustomEvent("typo3:filestoragetree:refresh"));');
-        self::waitUntilNavigationComponentIsLoaded($driver);
+        self::waitUntilFolderTreeIsLoaded($driver);
     }
 
     /**
