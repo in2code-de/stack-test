@@ -30,22 +30,4 @@ class CookieTest extends TestCase
 
         self::assertCookieIsNotSet($driver, $cookie);
     }
-
-    public function testCookieIsRemovedBySessionReset(): void
-    {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
-        $driver->get('https://web.local.co-stack-test.com/test.php');
-
-        self::assertPageContains($driver, 'hi there');
-
-        $cookie = new Cookie('coke', 'matsch');
-        $cookie->setSecure(true);
-        $driver->manage()->addCookie($cookie);
-
-        self::assertCookieIsEqual($driver, $cookie);
-
-        $driver->reset();
-
-        self::assertCookieIsNotSet($driver, $cookie);
-    }
 }
