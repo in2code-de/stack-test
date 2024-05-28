@@ -163,7 +163,7 @@ class MultiWebDriver extends WebDriver
     {
         $firstKey = array_key_first($this->drivers);
         $drivers = $this->drivers;
-        unset($this->drivers[$firstKey]);
+        unset($drivers[$firstKey]);
         return $drivers;
     }
 
