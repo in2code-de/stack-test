@@ -83,8 +83,13 @@ stop:
 	echo "$(EMOJI_musical_score) Starting the docker compose project"
 	docker compose up -d
 
+## Run composer install
+composer-install:
+	echo "$(EMOJI_package) Composer install"
+	docker compose exec php composer install
+
 ## To start an existing project incl. repo cloning
-install-project: .install-packages .create-directories destroy .add-hosts-entry .create-certificate .docker-pull .docker-start .mysql-wait .print-online
+install-project: .install-packages .create-directories destroy .add-hosts-entry .create-certificate .docker-pull .docker-start .mysql-wait composer-install .print-online
 
 ## Outputs the success message that the project is online
 .print-online:
