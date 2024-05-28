@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   selenium-hub:
     image: ${SELENIUM_HUB_IMAGE:-selenium/hub}
