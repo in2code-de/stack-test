@@ -58,10 +58,10 @@ class AlertTest extends TestCase
         $alert = $driver->switchTo()->alert();
         $text = $alert->getText();
         self::assertSame('Enter your test message', $text);
-        $alert->sendKeys('My test string 1');
+        $alert->sendKeys('My test string 1716902080');
         $alert->accept();
 
-        self::assertElementEquals($driver, 'My test string 1', WebDriverBy::id('prompt-result'));
+        self::assertElementEquals($driver, 'My test string 1716902080', WebDriverBy::id('prompt-result'));
     }
 
     public function testPromptPopupCanBeCancelled(): void
@@ -72,7 +72,7 @@ class AlertTest extends TestCase
         $alert = $driver->switchTo()->alert();
         $text = $alert->getText();
         self::assertSame('Enter your test message', $text);
-        $alert->sendKeys('My test string 1');
+        $alert->sendKeys('My test string 1716902091');
         $alert->dismiss();
 
         self::assertElementEquals($driver, '', WebDriverBy::id('prompt-result'));
