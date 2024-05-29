@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CoStack\StackTest\Tests\Acceptance;
 
 use CoStack\StackTest\Test\Assert\DriverAssertions;
-use CoStack\StackTest\WebDriver\Factory;
+use CoStack\StackTest\WebDriver\WebDriverFactory;
 use Facebook\WebDriver\WebDriverBy;
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +15,7 @@ class PageTest extends TestCase
 
     public function testPageTitle(): void
     {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/form.php');
 
         self::assertPageTitleEquals($driver, 'Testing Form for test-stack');
@@ -26,7 +26,7 @@ class PageTest extends TestCase
 
     public function testPageHistoryNavigation(): void
     {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/test.php');
 
         self::assertCurrentUrlEquals($driver, 'https://web.local.co-stack-test.com/test.php');

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CoStack\StackTest\Tests\Acceptance;
 
 use CoStack\StackTest\Test\Assert\DriverAssertions;
-use CoStack\StackTest\WebDriver\Factory;
+use CoStack\StackTest\WebDriver\WebDriverFactory;
 use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +16,7 @@ class IframeNavigationTest extends TestCase
 
     public function testSwitchToIframeAndBack(): void
     {
-        $diver = Factory::getInstance()->createMultiDriver('session1');
+        $diver = WebDriverFactory::createMultiDriver();
         $diver->get('https://web.local.co-stack-test.com/iframe.php');
 
         self::assertPageContains($diver, 'Main frame');

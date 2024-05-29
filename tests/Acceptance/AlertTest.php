@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CoStack\StackTest\Tests\Acceptance;
 
 use CoStack\StackTest\Test\Assert\DriverAssertions;
-use CoStack\StackTest\WebDriver\Factory;
+use CoStack\StackTest\WebDriver\WebDriverFactory;
 use Facebook\WebDriver\WebDriverBy;
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +15,7 @@ class AlertTest extends TestCase
 
     public function testAlertPopupTextCanBeTested(): void
     {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/alert.php');
 
         $alert = $driver->switchTo()->alert();
@@ -26,7 +26,7 @@ class AlertTest extends TestCase
 
     public function testConfirmPopupCanBeAccepted(): void
     {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/confirm.php');
 
         $alert = $driver->switchTo()->alert();
@@ -39,7 +39,7 @@ class AlertTest extends TestCase
 
     public function testConfirmPopupCanBeDismissed(): void
     {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/confirm.php');
 
         $alert = $driver->switchTo()->alert();
@@ -52,7 +52,7 @@ class AlertTest extends TestCase
 
     public function testPromptPopupCanBeFilled(): void
     {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/prompt.php');
 
         $alert = $driver->switchTo()->alert();
@@ -66,7 +66,7 @@ class AlertTest extends TestCase
 
     public function testPromptPopupCanBeCancelled(): void
     {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/prompt.php');
 
         $alert = $driver->switchTo()->alert();

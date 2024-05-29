@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CoStack\StackTest\Tests\Acceptance;
 
 use CoStack\StackTest\Test\Assert\DriverAssertions;
-use CoStack\StackTest\WebDriver\Factory;
+use CoStack\StackTest\WebDriver\WebDriverFactory;
 use Facebook\WebDriver\Cookie;
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +15,7 @@ class CookieTest extends TestCase
 
     public function testCookieCanBeSetAndUnset(): void
     {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/test.php');
 
         self::assertPageContains($driver, 'hi there');

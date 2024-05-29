@@ -7,7 +7,7 @@ namespace CoStack\StackTest\Tests\Acceptance;
 use CoStack\StackTest\Elements\Single\Checkboxes;
 use CoStack\StackTest\Exception\HiddenInputCanNotBeFilledException;
 use CoStack\StackTest\Test\Assert\DriverAssertions;
-use CoStack\StackTest\WebDriver\Factory;
+use CoStack\StackTest\WebDriver\WebDriverFactory;
 use Facebook\WebDriver\WebDriverBy;
 use PHPUnit\Framework\TestCase;
 
@@ -17,7 +17,7 @@ class FormTest extends TestCase
 
     public function testInputWithoutNameCanBeFilled(): void
     {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::xpath('/html/body/form[1]/fieldset[1]/label/input');
@@ -29,7 +29,7 @@ class FormTest extends TestCase
 
     public function testInputWithNameCanBeFoundAndSubmitted(): void
     {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::name('name1');
@@ -45,7 +45,7 @@ class FormTest extends TestCase
 
     public function testInputWithIdCanBeFoundAndFilled(): void
     {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::id('id1');
@@ -57,7 +57,7 @@ class FormTest extends TestCase
 
     public function testInputWithClassCanBeFoundAndFilled(): void
     {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::className('class1');
@@ -69,7 +69,7 @@ class FormTest extends TestCase
 
     public function testInputWithDefaultValueCanBeFoundAndFilled(): void
     {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::cssSelector('[value=value1]');
@@ -83,7 +83,7 @@ class FormTest extends TestCase
 
     public function testInputWithDefaultValueAndNameCanBeSubmitted(): void
     {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::name('name2');
@@ -103,7 +103,7 @@ class FormTest extends TestCase
     {
         $this->expectException(HiddenInputCanNotBeFilledException::class);
 
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::name('name3');
@@ -115,7 +115,7 @@ class FormTest extends TestCase
     {
         $this->markTestSkipped('Not migrated yet');
 
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::name('check1[]');
@@ -143,7 +143,7 @@ class FormTest extends TestCase
     public function testRadiosCanBeSubmitted(): void
     {
         $this->markTestSkipped('Not migrated yet');
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::name('radio1');
@@ -164,7 +164,7 @@ class FormTest extends TestCase
     public function testSelectSingleCanBeSubmitted(): void
     {
         $this->markTestSkipped('Not migrated yet');
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/form.php');
 
         $selector = WebDriverBy::name('select1');
@@ -188,7 +188,7 @@ class FormTest extends TestCase
 
     public function testFormCanBeSubmittedWithValueData(): void
     {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/form.php');
 
         $formSelector = WebDriverBy::name('form1');

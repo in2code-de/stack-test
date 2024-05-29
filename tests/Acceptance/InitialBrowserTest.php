@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CoStack\StackTest\Tests\Acceptance;
 
 use CoStack\StackTest\Test\Assert\DriverAssertions;
-use CoStack\StackTest\WebDriver\Factory;
+use CoStack\StackTest\WebDriver\WebDriverFactory;
 use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverSelect;
@@ -17,7 +17,7 @@ class InitialBrowserTest extends TestCase
 
     public function testOpeningUrl(): void
     {
-        $driver = Factory::getInstance()->createMultiDriver('session1');
+        $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/test.php');
 
         self::assertPageContains($driver, 'hi there');

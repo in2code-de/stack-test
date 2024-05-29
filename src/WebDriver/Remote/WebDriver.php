@@ -7,7 +7,6 @@ namespace CoStack\StackTest\WebDriver\Remote;
 use Closure;
 use CoStack\StackTest\Elements\Single\Form;
 use CoStack\StackTest\Exception\HiddenInputCanNotBeFilledException;
-use CoStack\StackTest\WebDriver\Factory;
 use Facebook\WebDriver\Exception\ElementNotInteractableException;
 use Facebook\WebDriver\Exception\InvalidSessionIdException;
 use Facebook\WebDriver\Remote\HttpCommandExecutor;
@@ -30,15 +29,21 @@ class WebDriver extends RemoteWebDriver
         WebDriverCapabilities $capabilities,
         $isW3cCompliant = false,
     ) {
+        // Shutdown functions will close the session even if the process was terminated
         register_shutdown_function(fn() => $this->quit());
         parent::__construct(new RecordingCommandExecutor($commandExecutor), $sessionId, $capabilities, $isW3cCompliant);
         $this->browserName = $this->capabilities->getBrowserName();
         $this->manage()->window()->maximize();
     }
 
+    public function __destruct()
+    {
+        $this->quit();
+    }
+
     public function close(): static
     {
-        // Closing implicitly quits the session, but has shown to be problematic when repoening the session.
+        // Closing implicitly quits the session, but has shown to be problematic when reopening the session.
         // Quitting is more stable than closing.
         // https://developer.mozilla.org/en-US/docs/Web/WebDriver/Errors/InvalidSessionID#implicit_session_deletion
         $this->quit();
@@ -48,7 +53,6 @@ class WebDriver extends RemoteWebDriver
     public function quit(): void
     {
         try {
-            Factory::getInstance()->forgetDriver($this);
             parent::quit();
         } catch (InvalidSessionIdException) {
         }
