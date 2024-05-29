@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace CoStack\StackTest\WebDriver\Remote;
 
 use Facebook\WebDriver\Remote\RemoteTargetLocator;
-use Facebook\WebDriver\WebDriverAlert;
 
 class MultiRemoteTargetLocator extends RemoteTargetLocator
 {

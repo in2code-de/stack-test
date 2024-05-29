@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace CoStack\StackTest\WebDriver\Remote;
 
 use Closure;
-use CoStack\StackTest\Test\Constraint\Visibility\ElementIsNotVisible;
 use Exception;
 use Facebook\WebDriver\Interactions\WebDriverActions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
