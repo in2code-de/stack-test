@@ -10,9 +10,9 @@ use PHPUnit\Event\Test\FinishedSubscriber;
 
 class StopRecordingForTest implements FinishedSubscriber
 {
-    public function __construct(private readonly Screencast $screencast)
-    {
-    }
+    public function __construct(
+        private readonly Screencast $screencast,
+    ) {}
 
     public function notify(Finished $event): void
     {

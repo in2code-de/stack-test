@@ -34,9 +34,10 @@ class MultiWebDriver extends WebDriver
      * @noinspection MagicMethodsValidityInspection
      * @noinspection PhpMissingParentConstructorInspection
      */
-    public function __construct(public readonly string $sessionId, public readonly array $drivers)
-    {
-    }
+    public function __construct(
+        public readonly string $sessionId,
+        public readonly array $drivers,
+    ) {}
 
     public static function create(
         $selenium_server_url = 'http://localhost:4444/wd/hub',

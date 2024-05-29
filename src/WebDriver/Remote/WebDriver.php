@@ -14,7 +14,6 @@ use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverCapabilities;
-
 use Facebook\WebDriver\WebDriverElement;
 
 use function is_string;

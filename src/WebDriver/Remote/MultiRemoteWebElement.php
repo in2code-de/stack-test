@@ -23,9 +23,9 @@ class MultiRemoteWebElement extends RemoteWebElement
      * @noinspection MagicMethodsValidityInspection
      * @noinspection PhpMissingParentConstructorInspection
      */
-    public function __construct(public readonly array $elements)
-    {
-    }
+    public function __construct(
+        public readonly array $elements,
+    ) {}
 
     public function yieldElements(): Generator
     {
@@ -316,7 +316,7 @@ class MultiRemoteWebElement extends RemoteWebElement
     {
         $elements = [];
         foreach ($this->elements as $element) {
-            $elements[] =$element->getShadowRoot();
+            $elements[] = $element->getShadowRoot();
         }
         return new MultiShadowRoot($elements);
     }

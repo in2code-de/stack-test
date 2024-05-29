@@ -8,9 +8,9 @@ use Facebook\WebDriver\Remote\RemoteWebElement;
 
 class Textarea implements FormElement
 {
-    public function __construct(public readonly RemoteWebElement $element)
-    {
-    }
+    public function __construct(
+        public readonly RemoteWebElement $element,
+    ) {}
 
     public function getValue(): string|array
     {

@@ -12,8 +12,9 @@ class Radio implements FormElement
 {
     protected WebDriverRadios $radios;
 
-    public function __construct(public readonly RemoteWebElement $element)
-    {
+    public function __construct(
+        public readonly RemoteWebElement $element,
+    ) {
         $this->radios = new WebDriverRadios($this->element);
     }
 

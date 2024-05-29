@@ -9,9 +9,10 @@ use Facebook\WebDriver\WebDriverBy;
 
 class Form
 {
-    public function __construct(public readonly WebDriver $driver, public readonly WebDriverBy $by)
-    {
-    }
+    public function __construct(
+        public readonly WebDriver $driver,
+        public readonly WebDriverBy $by,
+    ) {}
 
     public function getData(): array
     {

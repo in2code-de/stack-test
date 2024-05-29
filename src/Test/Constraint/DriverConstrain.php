@@ -21,7 +21,6 @@ use function debug_backtrace;
 use function implode;
 use function in_array;
 use function is_array;
-
 use function reset;
 
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
@@ -32,8 +31,7 @@ abstract class DriverConstrain extends Constraint
 
     public function __construct(
         public readonly WebDriver $driver,
-    ) {
-    }
+    ) {}
 
     public static function resolve(mixed $other): Closure
     {

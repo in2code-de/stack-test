@@ -17,9 +17,9 @@ class MultiShadowRoot extends ShadowRoot
      * @noinspection MagicMethodsValidityInspection
      * @noinspection PhpMissingParentConstructorInspection
      */
-    public function __construct(public readonly array $shadowRoots)
-    {
-    }
+    public function __construct(
+        public readonly array $shadowRoots,
+    ) {}
 
     public static function createFromResponse(RemoteExecuteMethod $executor, array $response): never
     {

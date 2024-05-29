@@ -15,9 +15,9 @@ class MultiWebDriverWindow extends WebDriverWindow
      * @noinspection MagicMethodsValidityInspection
      * @noinspection PhpMissingParentConstructorInspection
      */
-    public function __construct(public readonly MultiWebDriver $driver)
-    {
-    }
+    public function __construct(
+        public readonly MultiWebDriver $driver,
+    ) {}
 
     public function getPosition(): WebDriverPoint
     {

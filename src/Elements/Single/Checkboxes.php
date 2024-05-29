@@ -12,8 +12,9 @@ class Checkboxes implements FormElement
 {
     protected WebDriverCheckboxes $checkboxes;
 
-    public function __construct(public readonly RemoteWebElement $element)
-    {
+    public function __construct(
+        public readonly RemoteWebElement $element,
+    ) {
         $this->checkboxes = new WebDriverCheckboxes($this->element);
     }
 

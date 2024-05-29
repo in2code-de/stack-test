@@ -15,8 +15,9 @@ class Select implements FormElement
 {
     protected WebDriverSelect $select;
 
-    public function __construct(public readonly RemoteWebElement $element)
-    {
+    public function __construct(
+        public readonly RemoteWebElement $element,
+    ) {
         $this->select = new WebDriverSelect($this->element);
     }
 

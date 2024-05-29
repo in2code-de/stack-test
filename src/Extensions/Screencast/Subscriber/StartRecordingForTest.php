@@ -10,9 +10,9 @@ use PHPUnit\Event\Test\PreparedSubscriber;
 
 class StartRecordingForTest implements PreparedSubscriber
 {
-    public function __construct(private readonly Screencast $screencast)
-    {
-    }
+    public function __construct(
+        private readonly Screencast $screencast,
+    ) {}
 
     public function notify(Prepared $event): void
     {

@@ -12,9 +12,9 @@ class MultiRemoteTargetLocator extends RemoteTargetLocator
      * @noinspection MagicMethodsValidityInspection
      * @noinspection PhpMissingParentConstructorInspection
      */
-    public function __construct(public readonly MultiWebDriver $multiWebDriver)
-    {
-    }
+    public function __construct(
+        public readonly MultiWebDriver $multiWebDriver,
+    ) {}
 
     public function defaultContent(): MultiWebDriver
     {

@@ -15,8 +15,10 @@ class HiddenInputCanNotBeFilledException extends StackTestException
     public const CODE = 1700902848;
 
     #[Pure]
-    public function __construct(public readonly RemoteWebElement $element, ?Throwable $previous = null)
-    {
+    public function __construct(
+        public readonly RemoteWebElement $element,
+        ?Throwable $previous = null,
+    ) {
         parent::__construct(self::MESSAGE, self::CODE, $previous);
     }
 }
