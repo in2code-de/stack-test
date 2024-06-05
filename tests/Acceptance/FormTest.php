@@ -113,8 +113,6 @@ class FormTest extends TestCase
 
     public function testCheckboxesCanBeSubmitted(): void
     {
-        $this->markTestSkipped('Not migrated yet');
-
         $driver = WebDriverFactory::createMultiDriver();
         $driver->get('https://web.local.co-stack-test.com/form.php');
 
@@ -122,16 +120,17 @@ class FormTest extends TestCase
 
         self::assertCheckboxesAreChecked($driver, ['2', '3'], $selector);
 
-        $checkboxes = $driver->findElement($selector);
-        $checkboxes->deselectAll();
+        $checkboxes = $driver->findElements($selector);
+        $checkboxElement = new \CoStack\StackTest\Elements\Multiple\Checkboxes($checkboxes);
+        $checkboxElement->deselectAll();
 
         self::assertCheckboxesAreChecked($driver, [], $selector);
 
-        $checkboxes->selectByValue('3');
+        $checkboxElement->selectByValue('3');
 
         self::assertCheckboxesAreChecked($driver, ['3'], $selector);
 
-        $checkboxes->selectByIndex(3);
+        $checkboxElement->selectByIndex(3);
 
         self::assertCheckboxesAreChecked($driver, ['3', '4'], $selector);
 
