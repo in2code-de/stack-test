@@ -15,7 +15,7 @@ class PageTest extends TestCase
 
     public function testPageTitle(): void
     {
-        $driver = WebDriverFactory::createMultiDriver();
+        $driver = WebDriverFactory::createChromeDriver();
         $driver->get('https://web.local.co-stack-test.com/form.php');
 
         self::assertPageTitleEquals($driver, 'Testing Form for test-stack');
@@ -26,7 +26,7 @@ class PageTest extends TestCase
 
     public function testPageHistoryNavigation(): void
     {
-        $driver = WebDriverFactory::createMultiDriver();
+        $driver = WebDriverFactory::createChromeDriver();
         $driver->get('https://web.local.co-stack-test.com/test.php');
 
         self::assertCurrentUrlEquals($driver, 'https://web.local.co-stack-test.com/test.php');

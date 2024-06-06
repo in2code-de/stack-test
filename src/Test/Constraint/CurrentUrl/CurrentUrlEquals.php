@@ -5,23 +5,22 @@ declare(strict_types=1);
 namespace CoStack\StackTest\Test\Constraint\CurrentUrl;
 
 use CoStack\StackTest\Test\Constraint\DriverConstrain;
-use CoStack\StackTest\WebDriver\Remote\WebDriver;
 
 class CurrentUrlEquals extends DriverConstrain
 {
-    protected function driverMatches(mixed $other, WebDriver $driver): bool
+    protected function matches(mixed $other): bool
     {
-        $currentUrl = $driver->getCurrentURL();
+        $currentUrl = $this->driver->getCurrentURL();
         return $currentUrl === $other;
     }
 
-    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
+    public function toString(bool $exportObjects = false): string
     {
-        $browserName = $driver->getCapabilities()->getBrowserName();
+        $browserName = $this->driver->getCapabilities()->getBrowserName();
 
         return sprintf(
             'equals %s in %s',
-            $driver->getCurrentURL(),
+            $this->driver->getCurrentURL(),
             $browserName,
         );
     }

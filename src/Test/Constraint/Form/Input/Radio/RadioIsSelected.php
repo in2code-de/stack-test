@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\Form\Input\Radio;
 
-use CoStack\StackTest\WebDriver\Remote\WebDriver;
-
 class RadioIsSelected extends SelectedRadiosConstraint
 {
-    protected function driverMatches(mixed $other, WebDriver $driver): bool
+    protected function matches(mixed $other): bool
     {
-        $selectedValues = $this->getSelectedOptionValues($driver);
+        $selectedValues = $this->getSelectedOptionValues();
         $selectedValue = reset($selectedValues);
         if (!is_string($selectedValue)) {
             return null === $other;
@@ -18,16 +16,16 @@ class RadioIsSelected extends SelectedRadiosConstraint
         return $other === $selectedValue;
     }
 
-    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
+    public function toString(bool $exportObjects = false): string
     {
-        $browserName = $driver->getCapabilities()->getBrowserName();
+        $browserName = $this->driver->getCapabilities()->getBrowserName();
 
-        $selectedValues = $this->getSelectedOptionValues($driver);
+        $selectedValues = $this->getSelectedOptionValues();
         $selectedValue = reset($selectedValues);
         if (!is_string($selectedValue)) {
             return sprintf(
                 'matches radio selection on page %s in browser %s',
-                $driver->getCurrentURL(),
+                $this->driver->getCurrentURL(),
                 $browserName,
             );
         }
@@ -35,7 +33,7 @@ class RadioIsSelected extends SelectedRadiosConstraint
         return sprintf(
             'matches selected radio %s on page %s in browser %s',
             $selectedValue,
-            $driver->getCurrentURL(),
+            $this->driver->getCurrentURL(),
             $browserName,
         );
     }

@@ -16,7 +16,7 @@ class IframeNavigationTest extends TestCase
 
     public function testSwitchToIframeAndBack(): void
     {
-        $diver = WebDriverFactory::createMultiDriver();
+        $diver = WebDriverFactory::createChromeDriver();
         $diver->get('https://web.local.co-stack-test.com/iframe.php');
 
         self::assertPageContains($diver, 'Main frame');

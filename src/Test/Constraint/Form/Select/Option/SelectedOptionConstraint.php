@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace CoStack\StackTest\Test\Constraint\Form\Select\Option;
 
 use CoStack\StackTest\Test\Constraint\Form\SelectableFormConstraint;
-use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Facebook\WebDriver\Exception\UnexpectedTagNameException;
 use Facebook\WebDriver\WebDriverSelect;
 use PHPUnit\Util\Exporter;
@@ -15,18 +14,18 @@ abstract class SelectedOptionConstraint extends SelectableFormConstraint
     /**
      * @throws UnexpectedTagNameException
      */
-    protected function getWebDriverObject(WebDriver $driver): WebDriverSelect
+    protected function getWebDriverObject(): WebDriverSelect
     {
-        $element = $driver->findElement($this->selector);
+        $element = $this->driver->findElement($this->selector);
         return new WebDriverSelect($element);
     }
 
-    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
+    public function toString(bool $exportObjects = false): string
     {
-        $browserName = $driver->getCapabilities()->getBrowserName();
+        $browserName = $this->driver->getCapabilities()->getBrowserName();
 
         $selectedValuesString = [];
-        foreach ($this->getWebDriverObject($driver) as $selectedOption) {
+        foreach ($this->getWebDriverObject() as $selectedOption) {
             $selectedValuesString[] = $selectedOption->getText() . '(' . $selectedOption->getAttribute('value') . ')';
         }
         if (empty($selectedValuesString)) {
@@ -37,7 +36,7 @@ abstract class SelectedOptionConstraint extends SelectableFormConstraint
             'is selected in field %s with selected elements %s on page %s in browser %s',
             Exporter::export($this->selector, $exportObjects),
             implode(', ', $selectedValuesString),
-            $driver->getCurrentURL(),
+            $this->driver->getCurrentURL(),
             $browserName,
         );
     }

@@ -3,7 +3,6 @@
 ## Features
 
 * No configuration to get started.
-* Run tests in multiple browsers in parallel while still using the php-webdriver API.
 * Countless assertions for any possible assertion of elements, contents, ...
 * Assertions can also be used as conditions and expectations (to wait for something to happen in the browser)
 * Far less complicated than testing Frameworks like codeception

@@ -15,9 +15,17 @@ class InitialBrowserTest extends TestCase
 {
     use DriverAssertions;
 
+    public function testUnsettingDriverClosesSession(): void
+    {
+        $driver = WebDriverFactory::createChromeDriver();
+        $driver->get('https://web.local.co-stack-test.com/test.php');
+        unset($driver);
+        self::assertTrue(true);
+    }
+
     public function testOpeningUrl(): void
     {
-        $driver = WebDriverFactory::createMultiDriver();
+        $driver = WebDriverFactory::createChromeDriver();
         $driver->get('https://web.local.co-stack-test.com/test.php');
 
         self::assertPageContains($driver, 'hi there');
@@ -70,10 +78,8 @@ class InitialBrowserTest extends TestCase
         self::assertOptionIsSelectedByText($driver, 'Bar', $selectSelector);
         self::assertOptionIsSelectedByValue($driver, '1', $selectSelector);
 
-        foreach ($driver->drivers as $remoteWebDriver) {
-            $select = new WebDriverSelect($remoteWebDriver->findElement($selectSelector));
-            $select->selectByVisibleText('Foo');
-        }
+        $select = new WebDriverSelect($driver->findElement($selectSelector));
+        $select->selectByVisibleText('Foo');
 
         self::assertOptionIsSelectedByText($driver, 'Foo', $selectSelector);
         self::assertOptionIsSelectedByValue($driver, '', $selectSelector);

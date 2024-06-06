@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace CoStack\StackTest\Elements\Single;
+namespace CoStack\StackTest\Elements;
 
-use Exception;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 
-class Text implements FormElement
+class Textarea implements FormElement
 {
     public function __construct(
         public readonly RemoteWebElement $element,
@@ -15,15 +14,11 @@ class Text implements FormElement
 
     public function getValue(): string|array
     {
-        $value = $this->element->getAttribute('value');
-        return $value;
+        return $this->element->getAttribute('value');
     }
 
     public function setValue(array|string $value): void
     {
-        if (!is_string($value)) {
-            throw new Exception('Value to set for input type text must be string');
-        }
         $this->element->clear();
         $this->element->sendKeys($value);
     }

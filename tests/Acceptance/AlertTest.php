@@ -15,7 +15,7 @@ class AlertTest extends TestCase
 
     public function testAlertPopupTextCanBeTested(): void
     {
-        $driver = WebDriverFactory::createMultiDriver();
+        $driver = WebDriverFactory::createChromeDriver();
         $driver->get('https://web.local.co-stack-test.com/alert.php');
 
         $alert = $driver->switchTo()->alert();
@@ -26,7 +26,7 @@ class AlertTest extends TestCase
 
     public function testConfirmPopupCanBeAccepted(): void
     {
-        $driver = WebDriverFactory::createMultiDriver();
+        $driver = WebDriverFactory::createChromeDriver();
         $driver->get('https://web.local.co-stack-test.com/confirm.php');
 
         $alert = $driver->switchTo()->alert();
@@ -39,7 +39,7 @@ class AlertTest extends TestCase
 
     public function testConfirmPopupCanBeDismissed(): void
     {
-        $driver = WebDriverFactory::createMultiDriver();
+        $driver = WebDriverFactory::createChromeDriver();
         $driver->get('https://web.local.co-stack-test.com/confirm.php');
 
         $alert = $driver->switchTo()->alert();
@@ -52,7 +52,7 @@ class AlertTest extends TestCase
 
     public function testPromptPopupCanBeFilled(): void
     {
-        $driver = WebDriverFactory::createMultiDriver();
+        $driver = WebDriverFactory::createChromeDriver();
         $driver->get('https://web.local.co-stack-test.com/prompt.php');
 
         $alert = $driver->switchTo()->alert();
@@ -66,7 +66,7 @@ class AlertTest extends TestCase
 
     public function testPromptPopupCanBeCancelled(): void
     {
-        $driver = WebDriverFactory::createMultiDriver();
+        $driver = WebDriverFactory::createChromeDriver();
         $driver->get('https://web.local.co-stack-test.com/prompt.php');
 
         $alert = $driver->switchTo()->alert();

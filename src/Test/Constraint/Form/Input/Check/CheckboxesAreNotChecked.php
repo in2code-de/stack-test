@@ -10,13 +10,13 @@ use Facebook\WebDriver\WebDriverCheckboxes;
 
 class CheckboxesAreNotChecked extends SelectedCheckboxesConstraint
 {
-    protected function driverMatches(mixed $other, WebDriver $driver): bool
+    protected function matches(mixed $other): bool
     {
-        $other = $this->resolveSelectorsInOtherToValue($driver, $other);
+        $other = $this->resolveSelectorsInOtherToValue($other);
         if (is_string($other)) {
             $other = [$other];
         }
-        $checkedValues = $this->getCheckedValues($driver);
+        $checkedValues = $this->getCheckedValues();
         return empty(array_intersect($other, $checkedValues));
     }
 
@@ -28,25 +28,25 @@ class CheckboxesAreNotChecked extends SelectedCheckboxesConstraint
         return $checkboxes->getAllSelectedOptions();
     }
 
-    protected function getCheckedValues(WebDriver $driver): array
+    protected function getCheckedValues(): array
     {
         $values = [];
-        foreach ($this->getCheckedCheckboxes($driver) as $checkbox) {
+        foreach ($this->getCheckedCheckboxes($this->driver) as $checkbox) {
             $values[] = $checkbox->getAttribute('value');
         }
         return $values;
     }
 
-    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
+    public function toString(bool $exportObjects = false): string
     {
-        $browserName = $driver->getCapabilities()->getBrowserName();
+        $browserName = $this->driver->getCapabilities()->getBrowserName();
 
-        $checkedValues = $this->getCheckedValues($driver);
+        $checkedValues = $this->getCheckedValues();
 
         return sprintf(
             'is not in the selected checkboxes %s on page %s in browser %s',
             implode(', ', $checkedValues),
-            $driver->getCurrentURL(),
+            $this->driver->getCurrentURL(),
             $browserName,
         );
     }

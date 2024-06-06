@@ -15,7 +15,7 @@ class CookieTest extends TestCase
 
     public function testCookieCanBeSetAndUnset(): void
     {
-        $driver = WebDriverFactory::createMultiDriver();
+        $driver = WebDriverFactory::createChromeDriver();
         $driver->get('https://web.local.co-stack-test.com/test.php');
 
         self::assertPageContains($driver, 'hi there');

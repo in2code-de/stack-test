@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CoStack\StackTest\Elements\Single;
+namespace CoStack\StackTest\Elements;
 
 use Facebook\WebDriver\Remote\RemoteWebElement;
 

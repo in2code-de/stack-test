@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\Form\Input\Radio;
 
-use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Exception;
+
+use function reset;
 
 class RadioIsNotSelected extends SelectedRadiosConstraint
 {
-    protected function driverMatches(mixed $other, WebDriver $driver): bool
+    protected function matches(mixed $other): bool
     {
-        $other = $this->resolveSelectorsInOtherToValue($driver, $other);
+        $other = $this->resolveSelectorsInOtherToValue($other);
         if (!is_string($other) && null !== $other) {
             throw new Exception(
                 'Value to test against must be of type string or null ' . get_debug_type($other) . ' given',
             );
         }
 
-        $selectedValues = $this->getSelectedOptionValues($driver);
+        $selectedValues = $this->getSelectedOptionValues();
         $selectedValue = reset($selectedValues);
         if (!is_string($selectedValue)) {
             // No radio selected, check if selection is not "no selection" (=null)
@@ -28,15 +29,16 @@ class RadioIsNotSelected extends SelectedRadiosConstraint
         return $other !== $selectedValues;
     }
 
-    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
+    public function toString(bool $exportObjects = false): string
     {
-        $selectedValue = $this->getSelectedValue($driver);
+        $selectedValues = $this->getSelectedOptionValues();
+        $selectedValue = reset($selectedValues);
 
         return sprintf(
             'does not match selected radio %s on page %s in browser %s',
             $selectedValue,
-            $driver->getCurrentURL(),
-            $driver->browserName,
+            $this->driver->getCurrentURL(),
+            $this->driver->browserName,
         );
     }
 }

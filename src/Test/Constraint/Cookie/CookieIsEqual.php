@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace CoStack\StackTest\Test\Constraint\Cookie;
 
 use CoStack\StackTest\Test\Constraint\DriverConstrain;
-use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Exception;
 use Facebook\WebDriver\Cookie;
 use PHPUnit\Util\Exporter;
@@ -16,15 +15,15 @@ class CookieIsEqual extends DriverConstrain
 {
     protected ?array $setCookie = null;
 
-    protected function driverMatches(mixed $other, WebDriver $driver): bool
+    protected function matches(mixed $other): bool
     {
         if (!$other instanceof Cookie) {
             throw new Exception('Cookie must be instance of \Facebook\WebDriver\Cookie');
         }
-        $cookies = $driver->manage()->getCookies();
+        $cookies = $this->driver->manage()->getCookies();
         foreach ($cookies as $cookie) {
             if ($cookie->getName() === $other->getName()) {
-                $browserName = $driver->getCapabilities()->getBrowserName();
+                $browserName = $this->driver->getCapabilities()->getBrowserName();
                 $this->setCookie[$browserName] = $cookie;
 
                 $cookieArray = $cookie->toArray();
@@ -47,10 +46,10 @@ class CookieIsEqual extends DriverConstrain
         return false;
     }
 
-    protected function descriptionForDriver(WebDriver $driver, bool $exportObjects = false): string
+    public function toString(bool $exportObjects = false): string
     {
-        $browserName = $driver->getCapabilities()->getBrowserName();
-        $lastVisitedUrl = $driver->getCurrentURL();
+        $browserName = $this->driver->getCapabilities()->getBrowserName();
+        $lastVisitedUrl = $this->driver->getCurrentURL();
 
         if (!isset($this->setCookie[$browserName])) {
             return sprintf(

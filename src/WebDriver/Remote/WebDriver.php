@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CoStack\StackTest\WebDriver\Remote;
 
 use Closure;
-use CoStack\StackTest\Elements\Single\Form;
+use CoStack\StackTest\Elements\Form;
 use CoStack\StackTest\Exception\HiddenInputCanNotBeFilledException;
 use Facebook\WebDriver\Exception\ElementNotInteractableException;
 use Facebook\WebDriver\Exception\InvalidSessionIdException;
@@ -28,8 +28,6 @@ class WebDriver extends RemoteWebDriver
         WebDriverCapabilities $capabilities,
         $isW3cCompliant = false,
     ) {
-        // Shutdown functions will close the session even if the process was terminated
-        register_shutdown_function(fn() => $this->quit());
         parent::__construct(new RecordingCommandExecutor($commandExecutor), $sessionId, $capabilities, $isW3cCompliant);
         $this->browserName = $this->capabilities->getBrowserName();
         $this->manage()->window()->maximize();

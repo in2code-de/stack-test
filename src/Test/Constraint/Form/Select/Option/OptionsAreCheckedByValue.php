@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace CoStack\StackTest\Test\Constraint\Form\Select\Option;
 
-use CoStack\StackTest\WebDriver\Remote\WebDriver;
-
 class OptionsAreCheckedByValue extends SelectedOptionConstraint
 {
-    protected function driverMatches(mixed $other, WebDriver $driver): bool
+    protected function matches(mixed $other): bool
     {
-        $other = $this->resolveSelectorsInOtherToValue($driver, $other);
+        $other = $this->resolveSelectorsInOtherToValue($other);
 
-        $selectedOptionTexts = $this->getSelectedOptionValues($driver);
+        $selectedOptionTexts = $this->getSelectedOptionValues();
 
         $missingSelections = array_diff($other, $selectedOptionTexts);
         $superfluousSelections = array_diff($selectedOptionTexts, $other);
