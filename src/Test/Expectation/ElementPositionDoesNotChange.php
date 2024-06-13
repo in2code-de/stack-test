@@ -16,8 +16,11 @@ class ElementPositionDoesNotChange
     {
         /** @var list<WebDriverPoint> $previous */
         $previous = [];
-        return static function (WebDriver $driver) use (&$previous, &$finished, $locator): bool {
+        return static function (WebDriver $driver) use (&$previous, $locator): bool {
             $elements = $driver->findElements($locator);
+            if (empty($elements)){
+                return true;
+            }
             foreach ($elements as $element) {
                 $elementId = $element->getID();
                 try {
