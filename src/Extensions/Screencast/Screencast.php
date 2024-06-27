@@ -55,7 +55,11 @@ class Screencast implements Extension
                 throw new Exception('Parameter ' . $parameter . ' is not set');
             }
         }
-        $logsPath = $this->parameters['logs'];
+        $logsPath = str_replace(
+            '{seed}',
+            (string)$this->configuration->randomOrderSeed(),
+            $this->parameters['logs']
+        );
         if (!str_starts_with($logsPath, '/')) {
             $basePath = dirname($configuration->configurationFile());
             $logsPath = concat_paths($basePath, $logsPath);
