@@ -127,6 +127,7 @@ class Screencast implements Extension
             'docker',
             'run',
             '--rm',
+            '--platform=linux/amd64',
             '--network=' . $this->parameters['network'],
             '-v' . $path . ':/videos',
             '-eDISPLAY_CONTAINER_NAME=' . $this->parameters['browser-container-name'],
