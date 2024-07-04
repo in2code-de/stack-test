@@ -146,6 +146,23 @@ class TYPO3Helper
         }
     }
 
+    public static function searchInPageTreeAndSelectFirstOccurrence(
+        WebDriver $driver,
+        string $searchString,
+    )
+    {
+        $searchField = $driver->findElement(
+            WebDriverBy::xpath('//*[@id="typo3-pagetree-toolbar"]//input[@type="search"]'),
+        );
+        $searchField->sendKeys($searchString);
+        self::waitUntilPageTreeIsLoaded($driver);
+
+        $pageTreeElement = $driver->findElement(
+            WebDriverBy::xpath('//*[@id="typo3-pagetree-treeContainer"]//*[@class="node-highlight-text"]'),
+        );
+        $pageTreeElement->click();
+    }
+
     public static function selectInFileStorageTree(
         WebDriver $driver,
         array $folderPath,
