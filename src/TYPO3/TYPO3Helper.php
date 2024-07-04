@@ -157,6 +157,9 @@ class TYPO3Helper
         $searchField->sendKeys($searchString);
         self::waitUntilPageTreeIsLoaded($driver);
 
+        // Workaround
+        sleep(1);
+
         $pageTreeElement = $driver->findElement(
             WebDriverBy::xpath('//*[@id="typo3-pagetree-treeContainer"]//*[@class="node-highlight-text"]'),
         );
