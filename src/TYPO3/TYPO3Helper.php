@@ -154,6 +154,7 @@ class TYPO3Helper
         $searchField = $driver->findElement(
             WebDriverBy::xpath('//*[@id="typo3-pagetree-toolbar"]//input[@type="search"]'),
         );
+        $searchField->clear();
         $searchField->sendKeys($searchString);
         self::waitUntilPageTreeIsLoaded($driver);
 
