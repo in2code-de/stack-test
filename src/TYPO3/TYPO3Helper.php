@@ -241,4 +241,18 @@ class TYPO3Helper
         $button->click();
         self::waitUntilModalIsClosed($driver);
     }
+
+    public static function clickContentElementFromNewContentElementWizard(WebDriver $driver, string $contentElementSelector): void
+    {
+        if ($driver->isInIFrameContext()) {
+            throw new Exception(__METHOD__ . ' must not be called in IFrame context');
+        }
+        self::waitUntilModalIsOpen($driver);
+        $contentElementButton = $driver
+            ->findElement(WebDriverBy::tagName('typo3-backend-new-content-element-wizard'))
+            ->getShadowRoot()
+            ->findElement(WebDriverBy::cssSelector('.item[data-identifier="' . $contentElementSelector . '"]'));
+        $contentElementButton->click();
+        self::waitUntilModalIsClosed($driver);
+    }
 }
