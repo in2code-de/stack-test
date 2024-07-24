@@ -159,7 +159,7 @@ class TYPO3Helper
         self::waitUntilPageTreeIsLoaded($driver);
 
         // Workaround
-        sleep(1);
+        sleep(3);
 
         $pageTreeElement = $driver->findElement(
             WebDriverBy::xpath('//*[@id="typo3-pagetree-treeContainer"]//*[@class="node-highlight-text"]'),
