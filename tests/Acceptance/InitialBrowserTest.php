@@ -45,7 +45,7 @@ class InitialBrowserTest extends TestCase
 
         $driver->findElement(WebDriverBy::linkText('test2'))->click();
 
-        self::assertPageContains($driver, 'PHP Version 8.1');
+        self::assertPageContains($driver, 'PHP Version 8.2');
         self::assertCurrentUrlContains($driver, 'est2');
         self::assertCurrentUrlNotContains($driver, 'test.php');
 

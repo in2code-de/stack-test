@@ -38,7 +38,7 @@
     "ext-mbstring": "*",
     "co-stack/lib": "^5.1 || ^v6.0",
     "php-webdriver/webdriver": "^1.15",
-    "phpunit/phpunit": "^9.6 || ^10.4"
+    "phpunit/phpunit": "^9.6 || ^10.4 || ^11.5"
   },
   "provide": {
     "symfony/polyfill-mbstring": "*"
