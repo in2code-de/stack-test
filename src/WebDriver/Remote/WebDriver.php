@@ -9,6 +9,7 @@ use CoStack\StackTest\Elements\Form;
 use CoStack\StackTest\Exception\HiddenInputCanNotBeFilledException;
 use Facebook\WebDriver\Exception\ElementNotInteractableException;
 use Facebook\WebDriver\Exception\InvalidSessionIdException;
+use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\HttpCommandExecutor;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\RemoteWebElement;
@@ -16,6 +17,7 @@ use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverCapabilities;
 use Facebook\WebDriver\WebDriverElement;
 
+use function gc_collect_cycles;
 use function is_string;
 
 class WebDriver extends RemoteWebDriver
@@ -31,6 +33,29 @@ class WebDriver extends RemoteWebDriver
         parent::__construct(new RecordingCommandExecutor($commandExecutor), $sessionId, $capabilities, $isW3cCompliant);
         $this->browserName = $this->capabilities->getBrowserName();
         $this->manage()->window()->maximize();
+    }
+
+    public static function create(
+        $selenium_server_url = 'http://localhost:4444/wd/hub',
+        $desired_capabilities = null,
+        $connection_timeout_in_ms = null,
+        $request_timeout_in_ms = null,
+        $http_proxy = null,
+        $http_proxy_port = null,
+        ?DesiredCapabilities $required_capabilities = null,
+    ): WebDriver {
+        // Run garbage collection to be sure to delete sessions that are only alive because they haven't been destructed
+        // by the GC yet. Otherwise, we might get problems with the amount of sessions that are allowed by selenium
+        gc_collect_cycles();
+        return parent::create(
+            $selenium_server_url,
+            $desired_capabilities,
+            $connection_timeout_in_ms,
+            $request_timeout_in_ms,
+            $http_proxy,
+            $http_proxy_port,
+            $required_capabilities,
+        );
     }
 
     public function __destruct()
