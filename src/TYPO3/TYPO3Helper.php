@@ -14,6 +14,8 @@ use Exception;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\WebDriverBy;
 
+use Facebook\WebDriver\WebDriverExpectedCondition;
+
 use function array_key_last;
 use function array_shift;
 use function array_values;
@@ -113,37 +115,83 @@ class TYPO3Helper
         Closure $afterSelectionCallback = null,
     ): void {
         $pagePath = array_values($pagePath);
-        self::waitUntilPageTreeIsLoaded($driver);
+        $currentLevel = 1;
+        $lastNode = null;
 
-        // Fail if nodes are not visible
-        $initialNode = $driver->findElement(
-            WebDriverBy::xpath('//*[@id="typo3-pagetree-treeContainer"]//*[@class="node"]'),
-        );
-
-        $pageTreeElement = $initialNode;
-
-        $lastIndex = array_key_last($pagePath);
         foreach ($pagePath as $index => $page) {
-            $webDriverBy = WebDriverBy::xpath("//following-sibling::*//*[text()='$page']/..");
-            $pageTreeElement = $pageTreeElement->findElement($webDriverBy);
+            $currentLevel++;
 
-            if ($index !== $lastIndex) {
-                try {
-                    // Expand the page tree if required
-                    $chevronElement = $pageTreeElement->findElement(WebDriverBy::cssSelector('.chevron.collapsed'));
-                    if ($chevronElement->isDisplayed()) {
-                        $chevronElement->click();
+            // First try to find the node at current level
+            $nodeLocator = WebDriverBy::xpath(
+                "//div[contains(@class, 'node') and @aria-level='{$currentLevel}']" .
+                "//div[contains(@class, 'node-name') and normalize-space(text())='{$page}']"
+            );
+
+            try {
+                // Wait for node to become visible
+                $node = self::waitForElement($driver, $nodeLocator, 10);
+
+                // If this is not the last item in the path, we need to check if the node needs expansion
+                if ($index < count($pagePath) - 1) {
+                    // Get the parent node element
+                    $parentNode = $node->findElement(
+                        WebDriverBy::xpath("ancestor::div[contains(@class, 'node')][@aria-expanded][1]")
+                    );
+
+                    // Check if node needs to be expanded
+                    if ($parentNode->getAttribute('aria-expanded') === '0') {
+                        // Find and click the toggle
+                        $toggle = $parentNode->findElement(
+                            WebDriverBy::cssSelector('span.node-toggle')
+                        );
+                        $toggle->click();
+
+                        // Wait for the children to load
+                        self::waitForAjax($driver);
+                        usleep(500000);
                     }
-                    self::waitUntilPageTreeIsLoaded($driver);
-                } catch (NoSuchElementException) {
                 }
+                // Only click the node if it's the last one in the path
+                else {
+                    $nodeContent = $node->findElement(
+                        WebDriverBy::xpath("ancestor::div[contains(@class, 'node-content')][1]")
+                    );
+                    $nodeContent->click();
+                    $lastNode = $nodeContent;
+                }
+
+            } catch (NoSuchElementException $e) {
+                throw new Exception("Could not find or interact with page '{$page}' in the page tree", 1706624556, $e);
             }
         }
-        $pageTreeElement->findElement(WebDriverBy::cssSelector('text.node-name'))->click();
+
         self::waitUntilContentIFrameIsLoaded($driver);
-        if (null !== $afterSelectionCallback) {
-            $afterSelectionCallback($driver, $pageTreeElement);
+        if (null !== $afterSelectionCallback && $lastNode !== null) {
+            $afterSelectionCallback($driver, $lastNode);
         }
+    }
+
+    private static function waitForElement(WebDriver $driver, $locator, $timeout = 10)
+    {
+        return $driver->wait($timeout, 250)->until(
+            WebDriverExpectedCondition::presenceOfElementLocated($locator)
+        );
+    }
+
+    private static function waitForAjax(WebDriver $driver, $timeout = 10)
+    {
+        $driver->wait($timeout, 250)->until(
+            function () use ($driver) {
+                try {
+                    $spinner = $driver->findElement(
+                        WebDriverBy::cssSelector('.node-loader[style*="display: block"]')
+                    );
+                    return false;
+                } catch (NoSuchElementException $e) {
+                    return true;
+                }
+            }
+        );
     }
 
     public static function searchInPageTreeAndSelectFirstOccurrence(
