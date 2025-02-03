@@ -13,10 +13,8 @@ use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Exception;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\WebDriverBy;
-
 use Facebook\WebDriver\WebDriverExpectedCondition;
 
-use function array_key_last;
 use function array_shift;
 use function array_values;
 use function is_string;
@@ -204,15 +202,14 @@ class TYPO3Helper
         );
         $searchField->clear();
         $searchField->sendKeys($searchString);
-        self::waitUntilPageTreeIsLoaded($driver);
 
         // Workaround
         sleep(3);
 
         $pageTreeElement = $driver->findElement(
-            WebDriverBy::xpath('//*[@id="typo3-pagetree-treeContainer"]//*[@class="node-highlight-text"]'),
+            WebDriverBy::xpath('//div[@role="treeitem"][.//span[@class="node-highlight-text"]]')
         );
-        $pageTreeElement->click();
+        $driver->action()->moveToElement($pageTreeElement)->click()->perform();
     }
 
     public static function selectInFileStorageTree(
