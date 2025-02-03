@@ -10,9 +10,11 @@ use CoStack\StackTest\Test\Constraint\Existence\ElementNotExists;
 use CoStack\StackTest\Test\Constraint\Script\ScriptReturnSame;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsNotVisible;
 use CoStack\StackTest\Test\Constraint\Visibility\ElementIsVisible;
+use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
+use Facebook\WebDriver\WebDriverWait;
 
 class TYPO3ExpectedCondition extends WebDriverExpectedCondition
 {
@@ -32,41 +34,16 @@ class TYPO3ExpectedCondition extends WebDriverExpectedCondition
         };
     }
 
-    public static function pageTreeIsLoaded(): Closure
+    public static function treeIsLoaded(): Closure
     {
-        $selector = WebDriverBy::cssSelector('#typo3-pagetree .svg-tree-loader');
-        $svgTreeLoaderExists = ElementExists::resolve($selector);
-        $svgTreeLoaderIsNotVisible = ElementIsNotVisible::resolve($selector);
-        $pageTreeNode = WebDriverBy::xpath('//*[@id="typo3-pagetree-treeContainer"]//*[@class="node"]');
-        $pageTreeNodeIsVisible = ElementIsVisible::resolve($pageTreeNode);
-
-        return static function (RemoteWebDriver $session) use (
-            $svgTreeLoaderExists,
-            $svgTreeLoaderIsNotVisible,
-            $pageTreeNodeIsVisible,
-        ): bool {
-            return $svgTreeLoaderExists($session)
-                && $svgTreeLoaderIsNotVisible($session)
-                && $pageTreeNodeIsVisible($session);
-        };
-    }
-
-    public static function folderTreeIsLoaded(): Closure
-    {
-        $selector = WebDriverBy::cssSelector('#typo3-filestoragetree .svg-tree-loader');
-        $svgTreeLoaderExists = ElementExists::resolve($selector);
-        $svgTreeLoaderIsNotVisible = ElementIsNotVisible::resolve($selector);
-        $folderTreeTreeNode = WebDriverBy::xpath('//*[@id="typo3-filestoragetree-tree"]//*[@class="node"]');
-        $folderTreeTreeNodeIsVisible = ElementIsVisible::resolve($folderTreeTreeNode);
-
-        return static function (RemoteWebDriver $session) use (
-            $svgTreeLoaderExists,
-            $svgTreeLoaderIsNotVisible,
-            $folderTreeTreeNodeIsVisible,
-        ): bool {
-            return $svgTreeLoaderExists($session)
-                && $svgTreeLoaderIsNotVisible($session)
-                && $folderTreeTreeNodeIsVisible($session);
+        return static function (RemoteWebDriver $driver): bool {
+            try {
+                return ElementExists::resolve(
+                    WebDriverBy::className('scaffold-content-navigation-available')
+                )($driver);
+            } catch (\Throwable $e) {
+                return false;
+            }
         };
     }
 }

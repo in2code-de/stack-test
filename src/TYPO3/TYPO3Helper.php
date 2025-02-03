@@ -31,14 +31,9 @@ class TYPO3Helper
         $driver->wait()->until(TYPO3ExpectedCondition::contentIFrameIsLoaded());
     }
 
-    public static function waitUntilPageTreeIsLoaded(WebDriver $driver): void
+    public static function waitUntilTreeIsLoaded(WebDriver $driver): void
     {
-        $driver->wait()->until(TYPO3ExpectedCondition::pageTreeIsLoaded());
-    }
-
-    public static function waitUntilFolderTreeIsLoaded(WebDriver $driver): void
-    {
-        $driver->wait()->until(TYPO3ExpectedCondition::folderTreeIsLoaded());
+        $driver->wait()->until(TYPO3ExpectedCondition::treeIsLoaded($driver));
     }
 
     public static function waitUntilModalIsOpen(WebDriver $driver): void
@@ -148,8 +143,7 @@ class TYPO3Helper
                         self::waitForAjax($driver);
                         usleep(500000);
                     }
-                }
-                // Only click the node if it's the last one in the path
+                } // Only click the node if it's the last one in the path
                 else {
                     $nodeContent = $node->findElement(
                         WebDriverBy::xpath("ancestor::div[contains(@class, 'node-content')][1]")
@@ -157,7 +151,6 @@ class TYPO3Helper
                     $nodeContent->click();
                     $lastNode = $nodeContent;
                 }
-
             } catch (NoSuchElementException $e) {
                 throw new Exception("Could not find or interact with page '{$page}' in the page tree", 1706624556, $e);
             }
@@ -195,8 +188,7 @@ class TYPO3Helper
     public static function searchInPageTreeAndSelectFirstOccurrence(
         WebDriver $driver,
         string $searchString,
-    )
-    {
+    ) {
         $searchField = $driver->findElement(
             WebDriverBy::xpath('//*[@id="typo3-pagetree-toolbar"]//input[@type="search"]'),
         );
@@ -212,39 +204,98 @@ class TYPO3Helper
         $driver->action()->moveToElement($pageTreeElement)->click()->perform();
     }
 
+
     public static function selectInFileStorageTree(
         WebDriver $driver,
-        array $folderPath,
+        array $filePath,
         Closure $afterSelectionCallback = null,
     ): void {
-        self::waitUntilFolderTreeIsLoaded($driver);
+        $filePath = array_values($filePath);
+        $currentLevel = 0;
+        $lastNode = null;
 
-        // Fail if nodes are not visible
+        foreach ($filePath as $index => $file) {
+            $currentLevel++;
 
-        $storage = array_shift($folderPath);
-        $storageSelector = WebDriverBy::xpath(
-            "//*[@id='typo3-filestoragetree-tree']//*[@class='node']//*[text()='$storage']/..",
-        );
-        $folderTreeElement = $driver->findElement($storageSelector);
-        foreach ($folderPath as $path) {
-            $folderSelector = WebDriverBy::xpath("./following-sibling::*//*[text()='$path']/..");
-            $folderTreeElement = $folderTreeElement->findElement($folderSelector);
+            // Find the node by level and name
+            $nodeLocator = WebDriverBy::xpath(
+                "//div[contains(@class, 'navigation-tree-container')]" .
+                "//div[contains(@class, 'node') and @aria-level='{$currentLevel}']" .
+                "//div[contains(@class, 'node-name') and normalize-space(text())='{$file}']"
+            );
 
             try {
-                // Expand the page tree if required
-                $chevronElement = $folderTreeElement->findElement(WebDriverBy::cssSelector('.chevron.collapsed'));
-                if ($chevronElement->isDisplayed()) {
-                    $chevronElement->click();
+                // Wait for node to become visible
+                $node = self::waitForElement($driver, $nodeLocator, 10);
+
+                // If this is not the last item, we need to handle expansion
+                if ($index < count($filePath) - 1) {
+                    $parentNode = $node->findElement(
+                        WebDriverBy::xpath("ancestor::div[contains(@class, 'node')][@aria-expanded][1]")
+                    );
+
+                    // If not expanded (aria-expanded="0"), click the toggle
+                    if ($parentNode->getAttribute('aria-expanded') === '0') {
+                        $toggle = $parentNode->findElement(
+                            WebDriverBy::cssSelector('span.node-toggle')
+                        );
+                        $toggle->click();
+
+                        // Wait for the expansion and children to load
+                        self::waitForAjax($driver);
+                        usleep(500000);
+
+                        // First verify the parent node is expanded
+                        self::waitForElement(
+                            $driver,
+                            WebDriverBy::xpath(
+                                "//div[contains(@class, 'node')][@aria-expanded='1']" .
+                                "//div[contains(@class, 'node-name') and normalize-space(text())='{$file}']"
+                            ),
+                            5
+                        );
+
+                        // Wait for child nodes to become visible (next level)
+                        $nextLevel = $currentLevel + 1;
+                        self::waitForElement(
+                            $driver,
+                            WebDriverBy::xpath(
+                                "//div[contains(@class, 'navigation-tree-container')]" .
+                                "//div[contains(@class, 'node') and @aria-level='{$nextLevel}']"
+                            ),
+                            5
+                        );
+                    }
+                } else {
+                    // For the last node, find and click its node-content directly
+                    $nodeContent = $node->findElement(
+                        WebDriverBy::xpath("ancestor::div[contains(@class, 'node-content')][1]")
+                    );
+                    $nodeContent->click();
+                    $lastNode = $nodeContent;
+
+                    // Verify selection
+                    self::waitForElement(
+                        $driver,
+                        WebDriverBy::xpath(
+                            "//div[contains(@class, 'node-selected')]" .
+                            "//div[contains(@class, 'node-name') and normalize-space(text())='{$file}']"
+                        ),
+                        5
+                    );
                 }
-                self::waitUntilFolderTreeIsLoaded($driver);
-            } catch (NoSuchElementException) {
+            } catch (NoSuchElementException $e) {
+                throw new Exception(
+                    "Could not find or interact with file/folder '{$file}' in the file tree at level {$currentLevel}",
+                    1706624557,
+                    $e
+                );
             }
         }
-        $folderTreeElement->findElement(WebDriverBy::cssSelector('text.node-name'))->click();
-        if (null !== $afterSelectionCallback) {
-            $afterSelectionCallback($driver, $folderTreeElement);
+
+        if (null !== $afterSelectionCallback && $lastNode !== null) {
+            $afterSelectionCallback($driver, $lastNode);
         }
-        self::waitUntilContentIFrameIsLoaded($driver);
     }
 
     public static function fillTYPO3FormField(WebDriver $driver, string $label, string $value): void
@@ -260,13 +311,13 @@ class TYPO3Helper
     public static function refreshPageTree(WebDriver $driver): void
     {
         $driver->executeScript('top.document.dispatchEvent(new CustomEvent("typo3:pagetree:refresh"));');
-        self::waitUntilPageTreeIsLoaded($driver);
+        self::waitUntilTreeIsLoaded($driver);
     }
 
     public static function refreshFileStorageTree(WebDriver $driver): void
     {
         $driver->executeScript('top.document.dispatchEvent(new CustomEvent("typo3:filestoragetree:refresh"));');
-        self::waitUntilFolderTreeIsLoaded($driver);
+        self::waitUntilTreeIsLoaded($driver);
     }
 
     /**
@@ -287,8 +338,10 @@ class TYPO3Helper
         self::waitUntilModalIsClosed($driver);
     }
 
-    public static function clickContentElementFromNewContentElementWizard(WebDriver $driver, string $contentElementSelector): void
-    {
+    public static function clickContentElementFromNewContentElementWizard(
+        WebDriver $driver,
+        string $contentElementSelector
+    ): void {
         if ($driver->isInIFrameContext()) {
             throw new Exception(__METHOD__ . ' must not be called in IFrame context');
         }
