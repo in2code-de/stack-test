@@ -1,3 +1,6 @@
+## This is a fork from [co-stack/stack-test](https://gitlab.com/co-stack.com/co-stack.com/php-packages/stack-test)
+and is used for testing the ContentPublisher packages.
+
 # co-stack/stack-test - enhance your PHPUnit with Browser testing
 
 ## Features
