@@ -195,13 +195,58 @@ class TYPO3Helper
         $searchField->clear();
         $searchField->sendKeys($searchString);
 
-        // Workaround
-        sleep(3);
+        $driver->wait()->until(
+            WebDriverExpectedCondition::visibilityOfElementLocated(
+                WebDriverBy::xpath('//div[@class="node-content"]//div[@class="node-contentlabel"]//span[@class="node-highlight-text"]')
+            )
+        );
 
         $pageTreeElement = $driver->findElement(
-            WebDriverBy::xpath('//div[@role="treeitem"][.//span[@class="node-highlight-text"]]')
+            WebDriverBy::xpath('//span[@class="node-highlight-text"]/ancestor::div[@role="treeitem" and contains(@class, "node")]')
         );
+
         $driver->action()->moveToElement($pageTreeElement)->click()->perform();
+    }
+
+    public static function reloadBackendPage(WebDriver $driver): void
+    {
+        $driver->navigate()->refresh();
+        self::waitUntilContentIFrameIsLoaded($driver);
+        self::waitUntilTreeIsLoaded($driver);
+    }
+
+    /**
+     * Clear page tree search and reset state
+     */
+    public static function clearPageTreeSearch(WebDriver $driver): void
+    {
+        // Clear the search field
+        $searchField = $driver->findElement(
+            WebDriverBy::xpath('//*[@id="typo3-pagetree-toolbar"]//input[@type="search"]'),
+        );
+        $searchField->clear();
+
+        // Clear any selections programmatically
+        $driver->executeScript('
+        // Remove all selected classes
+        document.querySelectorAll(".node-selected").forEach(el => {
+            el.classList.remove("node-selected");
+            el.removeAttribute("tabindex");
+        });
+        
+        // Remove all highlights
+        document.querySelectorAll(".node-highlight-text").forEach(el => {
+            const parent = el.parentNode;
+            parent.replaceChild(document.createTextNode(el.textContent), el);
+        });
+        
+        // Reset focus
+        if (document.activeElement) {
+            document.activeElement.blur();
+        }
+    ');
+
+        sleep(1);
     }
 
 
