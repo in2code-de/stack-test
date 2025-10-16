@@ -132,7 +132,7 @@ class TYPO3Helper
                     );
 
                     // Check if node needs to be expanded
-                    if ($parentNode->getAttribute('aria-expanded') === '0') {
+                    if ($parentNode->getAttribute('aria-expanded') === 'false') {
                         // Find and click the toggle
                         $toggle = $parentNode->findElement(
                             WebDriverBy::cssSelector('span.node-toggle')
@@ -279,8 +279,8 @@ class TYPO3Helper
                         WebDriverBy::xpath("ancestor::div[contains(@class, 'node')][@aria-expanded][1]")
                     );
 
-                    // If not expanded (aria-expanded="0"), click the toggle
-                    if ($parentNode->getAttribute('aria-expanded') === '0') {
+                    // If not expanded, click the toggle
+                    if ($parentNode->getAttribute('aria-expanded') === 'false') {
                         $toggle = $parentNode->findElement(
                             WebDriverBy::cssSelector('span.node-toggle')
                         );
@@ -294,7 +294,7 @@ class TYPO3Helper
                         self::waitForElement(
                             $driver,
                             WebDriverBy::xpath(
-                                "//div[contains(@class, 'node')][@aria-expanded='1']" .
+                                "//div[contains(@class, 'node')][@aria-expanded='true']" .
                                 "//div[contains(@class, 'node-name') and normalize-space(text())='{$file}']"
                             ),
                             5
