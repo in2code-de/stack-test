@@ -1,3 +1,11 @@
+> **📦 Migration Notice**  
+> This package was originally hosted at `gitlab.com/co-stack.com/php-packages/stack-test`.
+> It is now maintained by [in2code GmbH](https://www.in2code.de).
+>
+> - **Old location:** `co-stack.com/php-packages/stack-test` (no longer available)
+> - **New location:** `github.com/in2code-de/stack-test`
+> - **Composer name:** `co-stack/stack-test` (unchanged)
+
 # co-stack/stack-test - enhance your PHPUnit with Browser testing
 
 ## Features
