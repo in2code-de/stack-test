@@ -13,6 +13,7 @@ use CoStack\StackTest\WebDriver\Remote\WebDriver;
 use Exception;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverExpectedCondition;
 
 use function array_key_last;
 use function array_shift;
@@ -158,11 +159,10 @@ class TYPO3Helper
         $searchField->sendKeys($searchString);
         self::waitUntilPageTreeIsLoaded($driver);
 
-        // Workaround
-        sleep(3);
-
-        $pageTreeElement = $driver->findElement(
-            WebDriverBy::xpath('//*[@id="typo3-pagetree-treeContainer"]//*[@class="node-highlight-text"]'),
+        $pageTreeElement = $driver->wait()->until(
+            WebDriverExpectedCondition::visibilityOfElementLocated(
+                WebDriverBy::xpath('//*[@id="typo3-pagetree-treeContainer"]//*[@class="node-highlight-text"]'),
+            ),
         );
         $pageTreeElement->click();
     }
